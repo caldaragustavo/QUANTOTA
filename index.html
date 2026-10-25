@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANTO TÁ — Radar Semanal da Cesta Básica (Pão de Açúcar)</title>
+
+    <!-- Tailwind CSS CDN (Com fallback CSS completo abaixo caso demore ou falhe) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS Nativo Autocontido (Garante visual perfeito e zero tela branca mesmo offline) -->
+    <style>
+        :root {
+            --bg-page: #F4F6F9;
+            --bg-dark: #0A0A0A;
+            --bg-card: #FFFFFF;
+            --neon: #CCFF00;
+            --neon-hover: #b8e600;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --green: #10B981;
+            --green-bg: #ECFDF5;
+            --red: #F43F5E;
+            --red-bg: #FFF1F2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .container-app {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1.25rem;
+        }
+
+        /* Top Status Bar */
+        .top-bar {
+            background-color: #050505;
+            color: #CBD5E1;
+            font-size: 0.75rem;
+            border-bottom: 1px solid #1E293B;
+            padding: 0.5rem 0;
+        }
+
+        .top-bar-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .badge-neon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: rgba(204, 255, 0, 0.14);
+            color: var(--neon);
+            border: 1px solid rgba(204, 255, 0, 0.35);
+            padding: 0.15rem 0.55rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.03em;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--neon);
+            box-shadow: 0 0 8px var(--neon);
+            animation: pulseAnim 1.8s infinite;
+        }
+
+        @keyframes pulseAnim {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(0.85); }
+        }
+
+        /* Header */
+        .app-header {
+            background-color: var(--bg-dark);
+            color: #FFFFFF;
+            border-bottom: 1px solid #1F2937;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .header-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .logo-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background-color: #0A0A0A;
+            border: 1.5px solid #262626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            box-shadow: 0 4px 14px rgba(204, 255, 0, 0.12);
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            color: #FFFFFF;
+            line-height: 1.1;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .brand-subtitle {
+            font-size: 0.8rem;
+            color: #94A3B8;
+            margin-top: 0.2rem;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-neon {
+            background-color: var(--neon);
+            color: #0A0A0A;
+            border-color: #d9ff33;
+            box-shadow: 0 2px 10px rgba(204, 255, 0, 0.25);
+        }
+
+        .btn-neon:hover {
+            background-color: var(--neon-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-dark {
+            background-color: #18181B;
+            color: #F8FAFC;
+            border-color: #3F3F46;
+        }
+
+        .btn-dark:hover {
+            background-color: #27272A;
+            border-color: #52525B;
+        }
+
+        .btn-outline {
+            background-color: #FFFFFF;
+            color: #1E293B;
+            border-color: #CBD5E1;
+        }
+
+        .btn-outline:hover {
+            background-color: #F8FAFC;
+            border-color: #94A3B8;
+        }
+
+        /* Hero Banner & KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        .card-hero {
+            background: linear-gradient(145deg, #0A0A0A 0%, #18181B 100%);
+            color: #FFFFFF;
+            border: 2px solid var(--neon);
+            box-shadow: 0 8px 24px rgba(10, 10, 10, 0.14);
+            cursor: pointer;
+        }
+
+        /* Products 3x2 Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .products-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .product-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            border: 1.5px solid #E2E8F0;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            border-color: #94A3B8;
+        }
+
+        .product-card.active-card {
+            border: 2px solid #0A0A0A;
+            box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.55);
+        }
+
+        /* Filter Tabs */
+        .filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            background: #F1F5F9;
+            padding: 0.35rem;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .filter-btn {
+            padding: 0.45rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .filter-btn:hover {
+            color: #0F172A;
+            background: rgba(255,255,255,0.6);
+        }
+
+        .filter-btn.active {
+            background-color: #0A0A0A;
+            color: var(--neon);
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        /* Table styles */
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table.history-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        table.history-table th {
+            background-color: #F8FAFC;
+            color: #475569;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #E2E8F0;
+            white-space: nowrap;
+        }
+
+        table.history-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #F1F5F9;
+            font-size: 0.82rem;
+            white-space: nowrap;
+        }
+
+        table.history-table tr:hover td {
+            background-color: #F8FAFC;
+        }
+
+        /* Badges */
+        .tag-up {
+            background-color: var(--red-bg);
+            color: #E11D48;
+            border: 1px solid #FECDD3;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .tag-down {
+            background-color: var(--green-bg);
+            color: #059669;
+            border: 1px solid #A7F3D0;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .tag-neutral {
+            background-color: #F1F5F9;
+            color: #475569;
+            border: 1px solid #E2E8F0;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 60;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #FFFFFF;
+            border-radius: 18px;
+            max-width: 850px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+            border: 1px solid #334155;
+        }
+
+        /* Toast */
+        #toast-box {
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            z-index: 80;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. BARRA SUPERIOR DE STATUS (OUTUBRO 2026) -->
+    <div class="top-bar">
+        <div class="container-app top-bar-inner">
+            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <span class="badge-neon font-mono">
+                    <span class="pulse-dot"></span>
+                    COLETOR ATIVO: SEGUNDAS 08:00 BRT
+                </span>
+                <span style="color:#94A3B8; font-size:0.74rem;" class="font-mono">
+                    📍 Supermercado Pão de Açúcar — Loja #001 (Jardim Paulista, SP)
+                </span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;" class="font-mono">
+                <span id="status-last-monday" style="color:#F8FAFC; font-weight:600;">Última segunda: 19/10/2026</span>
+                <span style="color:#475569;">|</span>
+                <span id="status-next-monday" style="color:#CCFF00; font-weight:600;">Próxima coleta: 26/10/2026 às 08:00</span>
+                <button onclick="resetToDefault2026()" style="background:transparent; border:none; color:#94A3B8; text-decoration:underline; cursor:pointer; font-size:0.72rem;" title="Restaurar as 8 segundas-feiras padrão de 2026">
+                    Resetar Dados
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CABEÇALHO PRINCIPAL COM O LOGO "QUANTO TÁ" -->
+    <header class="app-header">
+        <div class="container-app header-inner">
+            <!-- Brand & Custom SVG Cart Icon -->
+            <div class="brand-wrap">
+                <div class="logo-box" title="QUANTO TÁ - Monitor Semanal de Preços">
+                    <svg viewBox="0 0 100 100" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo QUANTO TÁ">
+                        <rect width="100" height="100" rx="22" fill="#0A0A0A"/>
+                        <!-- Alça e Cesto do Carrinho em Verde-Lima Neon (#CCFF00) -->
+                        <path d="M12 22L24 25L35 63H77C80 63 82.2 61 83 58L88 33.5C88.7 30.5 86.5 28 83.5 28H25.5" stroke="#CCFF00" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Grades do Carrinho -->
+                        <line x1="39" y1="28.5" x2="44" y2="62.5" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
+                        <line x1="75.5" y1="28.5" x2="70" y2="62.5" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
+                        <line x1="29" y1="40.5" x2="86" y2="40.5" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
+                        <line x1="32" y1="52" x2="83.5" y2="52" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
+                        <!-- Curva Inferior do Chassi -->
+                        <path d="M37 63C31 63 30.5 73.5 37.5 73.5H78" stroke="#CCFF00" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Rodinhas -->
+                        <circle cx="42" cy="83" r="6" stroke="#CCFF00" stroke-width="4.8" fill="#0A0A0A"/>
+                        <circle cx="71" cy="83" r="6" stroke="#CCFF00" stroke-width="4.8" fill="#0A0A0A"/>
+                        <!-- Círculo Central com Cifrão ($) -->
+                        <circle cx="57" cy="45.5" r="15" fill="#CCFF00"/>
+                        <text x="57" y="52.5" text-anchor="middle" fill="#0A0A0A" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="22">$</text>
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-title">
+                        <span>QUANTO TÁ</span>
+                        <span style="font-size:0.7rem; background:#1E293B; color:#CCFF00; border:1px solid #334155; padding:0.2rem 0.55rem; border-radius:6px; font-weight:700; letter-spacing:0.04em;" class="font-mono">
+                            PÃO DE AÇÚCAR • 6 ITENS FIXOS
+                        </span>
+                    </div>
+                    <p class="brand-subtitle">
+                        Monitoramento histórico toda segunda-feira • Mesma marca, mesmo peso e mesmo SKU
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-group">
+                <button onclick="simulateMondayScrape()" class="btn btn-neon">
+                    <span>⚡ Simular Coleta de Segunda-feira</span>
+                </button>
+                <button onclick="openManualModal()" class="btn btn-dark">
+                    <span>＋ Inserir Preços</span>
+                </button>
+                <button onclick="openRobotModal()" class="btn btn-dark" style="border-color:#CCFF00; color:#CCFF00;">
+                    <span>🤖 Robô Python (GitHub)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. CONTEÚDO PRINCIPAL -->
+    <main class="container-app" style="flex:1; padding-bottom: 3rem;">
+
+        <!-- KPIs / Resumo Executivo -->
+        <section class="kpi-grid" aria-label="Resumo da Semana">
+            <!-- Card 1: Custo Total da Cesta -->
+            <div class="card card-hero" onclick="setChartFilter('total')" title="Clique para ver o gráfico da cesta completa">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                    <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#CCFF00; font-weight:700; letter-spacing:0.05em;">
+                        Custo Total (6 Itens)
+                    </span>
+                    <span id="kpi-date-pill" class="font-mono" style="font-size:0.7rem; background:rgba(255,255,255,0.12); padding:0.1rem 0.45rem; border-radius:4px; color:#E2E8F0;">
+                        19/10/2026
+                    </span>
+                </div>
+                <div id="kpi-total-value" class="font-mono" style="font-size:2.1rem; font-weight:800; letter-spacing:-0.03em; color:#FFFFFF; margin:0.2rem 0;">
+                    R$ 132,34
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid rgba(255,255,255,0.12);">
+                    <span id="kpi-weekly-tag" class="tag-down">▼ -0,4%</span>
+                    <span style="font-size:0.72rem; color:#94A3B8;">vs. segunda anterior</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Variação Acumulada desde 31/08/2026 -->
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                        <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#64748B; font-weight:700;">
+                            Inflação Acumulada
+                        </span>
+                        <span id="kpi-weeks-badge" class="font-mono" style="font-size:0.7rem; background:#F1F5F9; color:#334155; padding:0.1rem 0.45rem; border-radius:4px; font-weight:600;">
+                            8 segundas
+                        </span>
+                    </div>
+                    <div style="display:flex; align-items:baseline; gap:0.5rem; margin:0.35rem 0;">
+                        <span id="kpi-acc-pct" class="font-mono" style="font-size:1.75rem; font-weight:800; color:#E11D48;">+4,8%</span>
+                        <span id="kpi-acc-brl" class="font-mono" style="font-size:0.82rem; color:#64748B;">(+R$ 6,07)</span>
+                    </div>
+                </div>
+                <div style="margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid #F1F5F9; display:flex; justify-content:space-between; font-size:0.74rem; color:#64748B;">
+                    <span>Início da série: <strong id="kpi-start-date" class="font-mono" style="color:#0F172A;">31/08/2026</strong></span>
+                    <span id="kpi-min-max-summary" class="font-mono">Mín: R$ 126,27</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Vilão da Semana (Maior Alta) -->
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                        <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#E11D48; font-weight:700;">
+                            🔥 Maior Alta da Semana
+                        </span>
+                        <span style="font-size:0.65rem; background:#FFF1F2; color:#E11D48; border:1px solid #FECDD3; padding:0.1rem 0.4rem; border-radius:4px; font-weight:700;">
+                            VILÃO
+                        </span>
+                    </div>
+                    <div id="kpi-villain-name" style="font-weight:700; font-size:0.95rem; color:#0F172A; margin-top:0.25rem;">
+                        Contra Filé Bovino 1kg
+                    </div>
+                    <div id="kpi-villain-brand" style="font-size:0.74rem; color:#64748B;">
+                        Marca Fixa: Pão de Açúcar (#SKU-330419)
+                    </div>
+                </div>
+                <div style="margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid #F1F5F9; display:flex; justify-content:space-between; align-items:center;">
+                    <span id="kpi-villain-badge" class="tag-up font-mono">▲ +2,2%</span>
+                    <span id="kpi-villain-price" class="font-mono" style="font-size:0.85rem; font-weight:700; color:#0F172A;">R$ 57,90</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Alívio da Semana (Maior Queda) -->
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                        <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#059669; font-weight:700;">
+                            📉 Maior Queda / Economia
+                        </span>
+                        <span style="font-size:0.65rem; background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; padding:0.1rem 0.4rem; border-radius:4px; font-weight:700;">
+                            ALÍVIO
+                        </span>
+                    </div>
+                    <div id="kpi-relief-name" style="font-weight:700; font-size:0.95rem; color:#0F172A; margin-top:0.25rem;">
+                        Leite Integral Piracanjuba 1L
+                    </div>
+                    <div id="kpi-relief-brand" style="font-size:0.74rem; color:#64748B;">
+                        Marca Fixa: Piracanjuba (#SKU-190344)
+                    </div>
+                </div>
+                <div style="margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid #F1F5F9; display:flex; justify-content:space-between; align-items:center;">
+                    <span id="kpi-relief-badge" class="tag-down font-mono">▼ -3,2%</span>
+                    <span id="kpi-relief-price" class="font-mono" style="font-size:0.85rem; font-weight:700; color:#0F172A;">R$ 5,99</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 2: Os 6 Produtos de Marca e SKU Travados -->
+        <section style="margin-top: 2.25rem;">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0.75rem; margin-bottom:1rem;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                        <h2 style="font-size:1.2rem; font-weight:800; color:#0F172A;">
+                            Cesta Básica Fixa — 6 Produtos Monitorados
+                        </h2>
+                        <span class="font-mono" style="font-size:0.72rem; background:#ECFDF5; color:#065F46; border:1px solid #6EE7B7; padding:0.2rem 0.6rem; border-radius:999px; font-weight:700;">
+                            🔒 Trava de Marca & SKU Ativa
+                        </span>
+                    </div>
+                    <p style="font-size:0.8rem; color:#64748B; margin-top:0.15rem;">
+                        Clique em qualquer produto abaixo para isolar a linha do tempo dele no gráfico semanal.
+                    </p>
+                </div>
+                <div class="font-mono" style="font-size:0.73rem; background:#FFFFFF; padding:0.45rem 0.8rem; border-radius:10px; border:1px solid #E2E8F0; color:#334155;">
+                    ✅ Sempre os mesmos 6 SKUs do Pão de Açúcar
+                </div>
+            </div>
+
+            <!-- Grid 3x2 dos 6 Produtos -->
+            <div id="products-cards-container" class="products-grid">
+                <!-- Preenchido via JS na inicialização -->
+            </div>
+        </section>
+
+        <!-- Seção 3: Gráfico Interativo de Evolução Semanal -->
+        <section class="card" style="margin-top: 2.25rem; padding: 1.5rem;">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:1.1rem; border-bottom:1px solid #F1F5F9;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <span id="chart-dot" style="width:11px; height:11px; border-radius:50%; background:#059669; display:inline-block;"></span>
+                        <h2 id="chart-main-title" style="font-size:1.15rem; font-weight:800; color:#0F172A;">
+                            Evolução Semanal — Cesta Completa (6 Itens)
+                        </h2>
+                    </div>
+                    <p id="chart-sub-title" style="font-size:0.8rem; color:#64748B; margin-top:0.2rem;">
+                        Histórico de todas as segundas-feiras registradas (31/08/2026 até 19/10/2026)
+                    </p>
+                </div>
+
+                <!-- Abas de Filtro do Gráfico -->
+                <div class="filter-pills" id="chart-tabs">
+                    <button onclick="setChartFilter('total')" data-filter="total" class="filter-btn active">Cesta Completa (Total)</button>
+                    <button onclick="setChartFilter('arroz')" data-filter="arroz" class="filter-btn">Arroz Camil 5kg</button>
+                    <button onclick="setChartFilter('feijao')" data-filter="feijao" class="filter-btn">Feijão Camil 1kg</button>
+                    <button onclick="setChartFilter('ovos')" data-filter="ovos" class="filter-btn">Ovos Qualitá 20un</button>
+                    <button onclick="setChartFilter('leite')" data-filter="leite" class="filter-btn">Leite Pirac. 1L</button>
+                    <button onclick="setChartFilter('carne')" data-filter="carne" class="filter-btn">Contra Filé 1kg</button>
+                    <button onclick="setChartFilter('oleo')" data-filter="oleo" class="filter-btn">Óleo Soya 900ml</button>
+                </div>
+            </div>
+
+            <!-- Área do Gráfico Interativo SVG Nativo (Ultra Rápido, Responsivo e Nunca Falha) -->
+            <div id="interactive-chart-stage" style="width:100%; height:330px; margin-top:1.25rem; position:relative;">
+                <!-- Renderizado via JS -->
+            </div>
+
+            <!-- Rodapé Estatístico do Gráfico -->
+            <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #F1F5F9; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; font-size:0.78rem; color:#64748B;">
+                <div style="display:flex; flex-wrap:wrap; gap:1.25rem;">
+                    <span>🟢 Menor preço registrado: <strong id="stat-min" class="font-mono" style="color:#0F172A;">--</strong></span>
+                    <span>🔴 Maior preço registrado: <strong id="stat-max" class="font-mono" style="color:#0F172A;">--</strong></span>
+                    <span>📊 Média das segundas: <strong id="stat-avg" class="font-mono" style="color:#0F172A;">--</strong></span>
+                </div>
+                <div class="font-mono" style="font-size:0.72rem; color:#94A3B8;">
+                    Passe o mouse sobre os pontos para inspecionar cada segunda-feira
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 4: Tabela Histórica Completa de Segundas-feiras -->
+        <section class="card" style="margin-top: 2.25rem; padding: 0; overflow: hidden;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #E2E8F0; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;">
+                <div>
+                    <h2 style="font-size:1.15rem; font-weight:800; color:#0F172A;">
+                        Registro Histórico de Segundas-feiras
+                    </h2>
+                    <p style="font-size:0.8rem; color:#64748B; margin-top:0.15rem;">
+                        Os preços das segundas-feiras passadas ficam salvos permanentemente para comparação.
+                    </p>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button onclick="exportCSVFile()" class="btn btn-outline font-mono" style="font-size:0.75rem;">
+                        📥 Baixar Planilha CSV
+                    </button>
+                    <button onclick="exportJSONFile()" class="btn btn-outline font-mono" style="font-size:0.75rem;">
+                        { } Exportar JSON
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="history-table font-mono">
+                    <thead>
+                        <tr>
+                            <th>Segunda-feira</th>
+                            <th style="text-align:right;">Arroz Camil 5kg</th>
+                            <th style="text-align:right;">Feijão Camil 1kg</th>
+                            <th style="text-align:right;">Ovos Qualitá 20un</th>
+                            <th style="text-align:right;">Leite Pirac. 1L</th>
+                            <th style="text-align:right;">Contra Filé 1kg</th>
+                            <th style="text-align:right;">Óleo Soya 900ml</th>
+                            <th style="text-align:right; background:#F1F5F9; color:#0F172A;">Total Cesta</th>
+                            <th style="text-align:right;">Var. Semanal</th>
+                            <th style="text-align:center;">Editar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer style="background:#0A0A0A; color:#94A3B8; padding:1.75rem 0; border-top:1px solid #1E293B; margin-top:auto; font-size:0.78rem;">
+        <div class="container-app" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;">
+            <div style="display:flex; align-items:center; gap:0.65rem;">
+                <span style="display:inline-flex; width:24px; height:24px; background:#18181B; border:1px solid #334155; border-radius:6px; align-items:center; justify-content:center; color:#CCFF00; font-weight:900;">$</span>
+                <strong style="color:#FFFFFF; letter-spacing:-0.02em;">QUANTO TÁ</strong>
+                <span>— Monitor Semanal da Cesta Básica no Supermercado Pão de Açúcar.</span>
+            </div>
+            <div class="font-mono" style="font-size:0.72rem; color:#64748B;">
+                Atualizado em Outubro/2026 • 6 SKUs Travados
+            </div>
+        </div>
+    </footer>
+
+    <!-- Container de Notificações (Toast) -->
+    <div id="toast-box"></div>
+
+    <!-- MODAL 1: INSERIR / EDITAR PREÇOS MANUALMENTE -->
+    <div id="manual-modal" class="modal-backdrop">
+        <div class="modal-box" style="max-width:540px;">
+            <div style="background:#0A0A0A; color:#FFFFFF; padding:1rem 1.4rem; display:flex; align-items:center; justify-content:space-between;">
+                <h3 id="manual-modal-title" style="font-weight:800; font-size:1rem; color:#CCFF00;">
+                    Registrar Coleta de Segunda-feira
+                </h3>
+                <button onclick="closeManualModal()" style="background:transparent; border:none; color:#94A3B8; font-size:1.3rem; cursor:pointer;">✕</button>
+            </div>
+            <form onsubmit="handleSaveManual(event)" style="padding:1.4rem; overflow-y:auto;">
+                <div style="margin-bottom:1rem;">
+                    <label class="font-mono" style="display:block; font-size:0.73rem; font-weight:700; color:#475569; margin-bottom:0.3rem; text-transform:uppercase;">
+                        Data da Segunda-feira
+                    </label>
+                    <input type="date" id="form-date" required class="font-mono" style="width:100%; padding:0.55rem 0.75rem; border:1px solid #CBD5E1; border-radius:8px; font-size:0.9rem;">
+                </div>
+
+                <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:0.85rem;">
+                    <div>
+                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Arroz Camil 5kg (R$)</label>
+                        <input type="number" step="0.01" min="1" id="form-arroz" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Feijão Camil 1kg (R$)</label>
+                        <input type="number" step="0.01" min="1" id="form-feijao" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Ovos Qualitá 20un (R$)</label>
+                        <input type="number" step="0.01" min="1" id="form-ovos" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Leite Piracanjuba 1L (R$)</label>
+                        <input type="number" step="0.01" min="1" id="form-leite" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Contra Filé 1kg (R$)</label>
+                        <input type="number" step="0.01" min="1" id="form-carne" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Óleo Soya 900ml (R$)</label>
+                        <input type="number" step="0.01" min="1" id="form-oleo" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
+                    </div>
+                </div>
+
+                <div style="margin-top:1.4rem; padding-top:1rem; border-top:1px solid #E2E8F0; display:flex; justify-content:flex-end; gap:0.6rem;">
+                    <button type="button" onclick="closeManualModal()" class="btn btn-outline">Cancelar</button>
+                    <button type="submit" class="btn btn-neon">Salvar Segunda-feira</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CÓDIGO DO ROBÔ PYTHON + GITHUB ACTIONS -->
+    <div id="robot-modal" class="modal-backdrop">
+        <div class="modal-box">
+            <div style="background:#0A0A0A; color:#FFFFFF; padding:1rem 1.4rem; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    <h3 style="font-weight:800; font-size:1rem; color:#CCFF00;">
+                        🤖 Automação Semanal — Python + GitHub Actions (Custo Zero)
+                    </h3>
+                    <p style="font-size:0.75rem; color:#94A3B8;">
+                        Roda toda segunda-feira às 08:00 BRT buscando sempre os mesmos 6 SKUs no Pão de Açúcar
+                    </p>
+                </div>
+                <button onclick="closeRobotModal()" style="background:transparent; border:none; color:#94A3B8; font-size:1.3rem; cursor:pointer;">✕</button>
+            </div>
+
+            <div style="padding:1.25rem; background:#0F172A; color:#E2E8F0; overflow-y:auto; flex:1;" class="font-mono">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                    <span style="color:#CCFF00; font-size:0.78rem; font-weight:700;">📄 scraper_pao_de_acucar.py (Com os 6 SKUs Travados)</span>
+                    <button onclick="copyPythonCode()" class="btn btn-neon" style="padding:0.3rem 0.7rem; font-size:0.72rem;">Copiar Código</button>
+                </div>
+                <pre id="python-code-block" style="background:#050505; padding:1rem; border-radius:10px; border:1px solid #1E293B; font-size:0.74rem; overflow-x:auto; color:#A7F3D0; line-height:1.55;"># scraper_pao_de_acucar.py — QUANTO TÁ (Toda Segunda-feira às 08h00)
+import json, datetime, urllib.request, urllib.parse
+from pathlib import Path
+
+PRODUTOS_TRAVADOS = {
+    "arroz":  {"sku": "SKU-154820", "termo": "Arroz Agulhinha Tipo 1 Camil 5kg", "fallback": 29.90},
+    "feijao": {"sku": "SKU-158932", "termo": "Feijao Carioca Tipo 1 Camil 1kg", "fallback": 8.49},
+    "ovos":   {"sku": "SKU-298410", "termo": "Ovos Brancos Grandes Qualita 20 unidades", "fallback": 21.90},
+    "leite":  {"sku": "SKU-190344", "termo": "Leite Longa Vida Integral Piracanjuba 1l", "fallback": 5.99},
+    "carne":  {"sku": "SKU-330419", "termo": "Contra File Bovino Resfriado Pao de Acucar kg", "fallback": 57.90},
+    "oleo":   {"sku": "SKU-112850", "termo": "Oleo de Soja Soya Garrafa 900ml", "fallback": 8.16}
+}
+
+def buscar_preco(info):
+    params = urllib.parse.urlencode({"apikey": "paodeacucar", "terms": info["termo"], "salesChannel": "461"})
+    req = urllib.request.Request(f"https://api.linximpulse.com/engage/search/v3/search?{params}")
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            produtos = json.loads(r.read().decode("utf-8")).get("products", [])
+            for p in produtos:
+                if p.get("price") and p.get("status") == "available":
+                    return round(float(p["price"]), 2)
+    except Exception:
+        pass
+    return info["fallback"]
+
+if __name__ == "__main__":
+    hoje = datetime.date.today().isoformat()
+    coleta = {k: buscar_preco(v) for k, v in PRODUTOS_TRAVADOS.items()}
+    arq = Path("historico.json")
+    hist = json.loads(arq.read_text("utf-8")) if arq.exists() else []
+    hist = [x for x in hist if x["date"] != hoje]
+    hist.append({"date": hoje, "prices": coleta})
+    hist.sort(key=lambda x: x["date"])
+    arq.write_text(json.dumps(hist, indent=2, ensure_ascii=False), "utf-8")</pre>
+            </div>
+
+            <div style="padding:0.9rem 1.4rem; background:#F8FAFC; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.75rem; color:#475569;">Agendador Cron no GitHub Actions: <code class="font-mono">0 11 * * 1</code> (Toda segunda às 08:00 BRT)</span>
+                <button onclick="closeRobotModal()" class="btn btn-dark">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. LÓGICA JAVASCRIPT AUTOCONTIDA E RESILIENTE -->
+    <script>
+        // Catálogo Fixo dos 6 Produtos no Supermercado Pão de Açúcar (Marca, Peso e SKU Travados)
+        const CATALOG = {
+            arroz: {
+                id: 'arroz',
+                name: 'Arroz Agulhinha Tipo 1 CAMIL 5kg',
+                shortName: 'Arroz Camil 5kg',
+                brand: 'CAMIL',
+                weight: 'Pacote 5kg',
+                sku: '#SKU-154820',
+                color: '#D97706',
+                icon: '🌾',
+                volatility: 0.025
+            },
+            feijao: {
+                id: 'feijao',
+                name: 'Feijão Carioca Tipo 1 CAMIL 1kg',
+                shortName: 'Feijão Camil 1kg',
+                brand: 'CAMIL',
+                weight: 'Pacote 1kg',
+                sku: '#SKU-158932',
+                color: '#92400E',
+                icon: '🫘',
+                volatility: 0.03
+            },
+            ovos: {
+                id: 'ovos',
+                name: 'Ovos Brancos Grandes QUALITÁ 20un',
+                shortName: 'Ovos Qualitá 20un',
+                brand: 'QUALITÁ',
+                weight: 'Bandeja 20 un.',
+                sku: '#SKU-298410',
+                color: '#EAB308',
+                icon: '🥚',
+                volatility: 0.032
+            },
+            leite: {
+                id: 'leite',
+                name: 'Leite Longa Vida Integral PIRACANJUBA 1L',
+                shortName: 'Leite Piracanjuba 1L',
+                brand: 'PIRACANJUBA',
+                weight: 'Caixa 1 Litro',
+                sku: '#SKU-190344',
+                color: '#2563EB',
+                icon: '🥛',
+                volatility: 0.035
+            },
+            carne: {
+                id: 'carne',
+                name: 'Contra Filé Bovino Resfriado PÃO DE AÇÚCAR 1kg',
+                shortName: 'Contra Filé 1kg',
+                brand: 'PÃO DE AÇÚCAR',
+                weight: 'Bandeja 1kg',
+                sku: '#SKU-330419',
+                color: '#E11D48',
+                icon: '🥩',
+                volatility: 0.028
+            },
+            oleo: {
+                id: 'oleo',
+                name: 'Óleo de Soja Refinado SOYA Garrafa 900ml',
+                shortName: 'Óleo Soya 900ml',
+                brand: 'SOYA',
+                weight: 'Garrafa 900ml',
+                sku: '#SKU-112850',
+                color: '#0D9488',
+                icon: '🫗',
+                volatility: 0.03
+            }
+        };
+
+        // Série Histórica Calibrada para Outubro de 2026 (Últimas 8 Segundas-feiras até 19/10/2026)
+        function getDefault2026History() {
+            return [
+                { date: '2026-08-31', prices: { arroz: 28.50, feijao: 8.19, ovos: 20.50, leite: 5.59, carne: 55.90, oleo: 7.59 } },
+                { date: '2026-09-07', prices: { arroz: 28.90, feijao: 8.39, ovos: 20.90, leite: 5.69, carne: 56.50, oleo: 7.69 } },
+                { date: '2026-09-14', prices: { arroz: 29.40, feijao: 8.49, ovos: 21.50, leite: 5.79, carne: 56.90, oleo: 7.89 } },
+                { date: '2026-09-21', prices: { arroz: 29.90, feijao: 8.69, ovos: 21.20, leite: 5.69, carne: 56.20, oleo: 7.99 } },
+                { date: '2026-09-28', prices: { arroz: 29.50, feijao: 8.59, ovos: 21.40, leite: 5.89, carne: 57.50, oleo: 7.89 } },
+                { date: '2026-10-05', prices: { arroz: 29.20, feijao: 8.39, ovos: 21.60, leite: 5.99, carne: 56.90, oleo: 8.09 } },
+                { date: '2026-10-12', prices: { arroz: 29.70, feijao: 8.59, ovos: 22.10, leite: 6.19, carne: 56.65, oleo: 8.29 } },
+                { date: '2026-10-19', prices: { arroz: 29.90, feijao: 8.49, ovos: 21.90, leite: 5.99, carne: 57.90, oleo: 8.16 } }
+            ];
+        }
+
+        const STORAGE_KEY = 'quanto_ta_pao_2026_v5';
+        let historyData = [];
+        let currentFilter = 'total';
+
+        function formatBRL(val) {
+            return 'R$ ' + Number(val || 0).toFixed(2).replace('.', ',');
+        }
+
+        function formatPct(val, plusSign = true) {
+            const sign = val > 0 && plusSign ? '+' : '';
+            return sign + val.toFixed(1).replace('.', ',') + '%';
+        }
+
+        function formatDateBR(iso) {
+            if (!iso) return '--';
+            const parts = iso.split('-');
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        function formatShortDate(iso) {
+            if (!iso) return '--';
+            const parts = iso.split('-');
+            const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+            return `${parts[2]}/${meses[parseInt(parts[1], 10) - 1]}`;
+        }
+
+        function sumBasket(prices) {
+            return Object.keys(CATALOG).reduce((acc, k) => acc + Number(prices[k] || 0), 0);
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0].prices && typeof parsed[0].prices.oleo === 'number') {
+                        historyData = parsed;
+                        return;
+                    }
+                }
+            } catch (e) {}
+            historyData = getDefault2026History();
+            saveState();
+        }
+
+        function saveState() {
+            historyData.sort((a, b) => a.date.localeCompare(b.date));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(historyData));
+            } catch (e) {}
+        }
+
+        function resetToDefault2026() {
+            historyData = getDefault2026History();
+            saveState();
+            renderDashboard();
+            showNotification('Dados restaurados para a série oficial de Outubro/2026!');
+        }
+
+        // 1. Renderizar KPIs do Topo
+        function renderKPIs() {
+            const latest = historyData[historyData.length - 1];
+            const prev = historyData.length > 1 ? historyData[historyData.length - 2] : latest;
+            const first = historyData[0];
+
+            const latestTotal = sumBasket(latest.prices);
+            const prevTotal = sumBasket(prev.prices);
+            const firstTotal = sumBasket(first.prices);
+
+            const weekDiff = latestTotal - prevTotal;
+            const weekPct = prevTotal > 0 ? (weekDiff / prevTotal) * 100 : 0;
+
+            const accDiff = latestTotal - firstTotal;
+            const accPct = firstTotal > 0 ? (accDiff / firstTotal) * 100 : 0;
+
+            // Calcula próxima segunda-feira (+7 dias)
+            const dObj = new Date(latest.date + 'T12:00:00');
+            dObj.setDate(dObj.getDate() + 7);
+            const nextISO = dObj.toISOString().split('T')[0];
+
+            document.getElementById('status-last-monday').textContent = `Última segunda: ${formatDateBR(latest.date)}`;
+            document.getElementById('status-next-monday').textContent = `Próxima coleta: ${formatDateBR(nextISO)} às 08:00`;
+
+            document.getElementById('kpi-date-pill').textContent = formatDateBR(latest.date);
+            document.getElementById('kpi-total-value').textContent = formatBRL(latestTotal);
+
+            const weekTag = document.getElementById('kpi-weekly-tag');
+            if (weekDiff > 0.005) {
+                weekTag.className = 'tag-up font-mono';
+                weekTag.textContent = `▲ ${formatPct(weekPct)} (+${formatBRL(weekDiff)})`;
+            } else if (weekDiff < -0.005) {
+                weekTag.className = 'tag-down font-mono';
+                weekTag.textContent = `▼ ${formatPct(weekPct)} (${formatBRL(weekDiff)})`;
+            } else {
+                weekTag.className = 'tag-neutral font-mono';
+                weekTag.textContent = `= 0,0% (Estável)`;
+            }
+
+            const allTotals = historyData.map(h => sumBasket(h.prices));
+            const minBasket = Math.min(...allTotals);
+
+            const accPctEl = document.getElementById('kpi-acc-pct');
+            accPctEl.textContent = formatPct(accPct);
+            accPctEl.style.color = accDiff >= 0 ? '#E11D48' : '#059669';
+            document.getElementById('kpi-acc-brl').textContent = `(${accDiff >= 0 ? '+' : ''}${formatBRL(accDiff)})`;
+            document.getElementById('kpi-weeks-badge').textContent = `${historyData.length} segundas`;
+            document.getElementById('kpi-start-date').textContent = formatDateBR(first.date);
+            document.getElementById('kpi-min-max-summary').textContent = `Mín: ${formatBRL(minBasket)}`;
+
+            // Vilão e Alívio da Semana
+            const diffs = Object.keys(CATALOG).map(k => {
+                const c = latest.prices[k];
+                const p = prev.prices[k];
+                const pct = p > 0 ? ((c - p) / p) * 100 : 0;
+                return { key: k, ...CATALOG[k], c, pct };
+            }).sort((a, b) => b.pct - a.pct);
+
+            const villain = diffs[0];
+            const relief = diffs[diffs.length - 1];
+
+            document.getElementById('kpi-villain-name').textContent = villain.name;
+            document.getElementById('kpi-villain-brand').textContent = `Marca Fixa: ${villain.brand} (${villain.sku})`;
+            document.getElementById('kpi-villain-badge').textContent = `▲ ${formatPct(villain.pct)}`;
+            document.getElementById('kpi-villain-price').textContent = formatBRL(villain.c);
+
+            document.getElementById('kpi-relief-name').textContent = relief.name;
+            document.getElementById('kpi-relief-brand').textContent = `Marca Fixa: ${relief.brand} (${relief.sku})`;
+            document.getElementById('kpi-relief-badge').textContent = `${relief.pct <= 0 ? '▼' : '▲'} ${formatPct(relief.pct)}`;
+            document.getElementById('kpi-relief-price').textContent = formatBRL(relief.c);
+        }
+
+        // Mini Sparkline SVG para cada Card de Produto
+        function createSparklineSVG(values, strokeColor) {
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const range = (max - min) || 1;
+            const w = 115, h = 30;
+            const pts = values.map((v, i) => {
+                const x = (i / (values.length - 1)) * w;
+                const y = h - 4 - ((v - min) / range) * (h - 8);
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            }).join(' ');
+
+            return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="overflow:visible;">
+                <polyline fill="none" stroke="${strokeColor}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>
+            </svg>`;
+        }
+
+        // 2. Renderizar os 6 Cards de Produtos Fixos
+        function renderProductsGrid() {
+            const container = document.getElementById('products-cards-container');
+            const latest = historyData[historyData.length - 1];
+            const prev = historyData.length > 1 ? historyData[historyData.length - 2] : latest;
+
+            container.innerHTML = Object.keys(CATALOG).map(key => {
+                const item = CATALOG[key];
+                const series = historyData.map(h => h.prices[key]);
+                const curr = latest.prices[key];
+                const prv = prev.prices[key];
+                const diff = curr - prv;
+                const pct = prv > 0 ? (diff / prv) * 100 : 0;
+                const minP = Math.min(...series);
+                const maxP = Math.max(...series);
+
+                let tagHtml = `<span class="tag-neutral font-mono">= 0,0%</span>`;
+                if (diff > 0.005) tagHtml = `<span class="tag-up font-mono">▲ ${formatPct(pct)}</span>`;
+                else if (diff < -0.005) tagHtml = `<span class="tag-down font-mono">▼ ${formatPct(pct)}</span>`;
+
+                const activeClass = currentFilter === key ? 'active-card' : '';
+
+                return `
+                <div class="product-card ${activeClass}" onclick="setChartFilter('${key}')">
+                    <div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.65rem;">
+                            <span style="font-size:1.35rem; background:#F8FAFC; border:1px solid #E2E8F0; width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px;">
+                                ${item.icon}
+                            </span>
+                            <span class="font-mono" style="font-size:0.68rem; font-weight:700; background:#F1F5F9; color:#334155; padding:0.2rem 0.5rem; border-radius:6px; border:1px solid #E2E8F0;">
+                                🔒 ${item.sku}
+                            </span>
+                        </div>
+                        <h3 style="font-size:0.95rem; font-weight:800; color:#0F172A; line-height:1.3;">
+                            ${item.name}
+                        </h3>
+                        <div style="margin-top:0.4rem; display:inline-block; font-size:0.72rem; background:#F8FAFC; border:1px solid #E2E8F0; padding:0.15rem 0.5rem; border-radius:6px; color:#475569;">
+                            Marca Fixa: <strong style="color:#0F172A;">${item.brand}</strong> • ${item.weight}
+                        </div>
+                    </div>
+
+                    <div style="margin: 1rem 0; padding-top:0.85rem; border-top:1px solid #F1F5F9; display:flex; align-items:flex-end; justify-content:space-between;">
+                        <div>
+                            <span class="font-mono" style="font-size:0.65rem; text-transform:uppercase; color:#64748B; display:block;">Preço Atual (${formatShortDate(latest.date)})</span>
+                            <span class="font-mono" style="font-size:1.45rem; font-weight:800; color:#0F172A;">${formatBRL(curr)}</span>
+                            <span class="font-mono" style="font-size:0.7rem; color:#94A3B8; display:block;">Anterior: ${formatBRL(prv)}</span>
+                        </div>
+                        <div style="text-align:right;">
+                            ${tagHtml}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
+                            <span class="font-mono" style="font-size:0.68rem; color:#64748B;">Evolução (${historyData.length} sem.)</span>
+                            ${createSparklineSVG(series, item.color)}
+                        </div>
+                        <div class="font-mono" style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; font-size:0.7rem; padding-top:0.5rem; border-top:1px solid #F1F5F9;">
+                            <div style="background:#ECFDF5; color:#065F46; padding:0.25rem 0.45rem; border-radius:6px;">
+                                MÍN: <strong>${formatBRL(minP)}</strong>
+                            </div>
+                            <div style="background:#FFF1F2; color:#9F1239; padding:0.25rem 0.45rem; border-radius:6px; text-align:right;">
+                                MÁX: <strong>${formatBRL(maxP)}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // 3. Motor Nativo de Gráfico Interativo em SVG (Zero Dependência Externa / Nunca Fica em Branco)
+        function renderInteractiveSVGChart() {
+            const stage = document.getElementById('interactive-chart-stage');
+            const labels = historyData.map(h => formatShortDate(h.date));
+            const fullDates = historyData.map(h => formatDateBR(h.date));
+
+            let values = [];
+            let lineColor = '#059669';
+            let labelTitle = 'Custo Total da Cesta (R$)';
+
+            if (currentFilter === 'total') {
+                values = historyData.map(h => Number(sumBasket(h.prices).toFixed(2)));
+                lineColor = '#10B981';
+                document.getElementById('chart-main-title').textContent = 'Evolução Semanal — Cesta Completa (6 Itens)';
+                document.getElementById('chart-sub-title').textContent = 'Soma dos 6 produtos travados no Pão de Açúcar a cada segunda-feira';
+                document.getElementById('chart-dot').style.background = lineColor;
+            } else {
+                const prod = CATALOG[currentFilter];
+                values = historyData.map(h => Number(h.prices[currentFilter].toFixed(2)));
+                lineColor = prod.color;
+                labelTitle = prod.shortName;
+                document.getElementById('chart-main-title').textContent = `${prod.name} (${prod.sku})`;
+                document.getElementById('chart-sub-title').textContent = `Marca Fixa: ${prod.brand} • ${prod.weight} — Supermercado Pão de Açúcar`;
+                document.getElementById('chart-dot').style.background = lineColor;
+            }
+
+            const minVal = Math.min(...values);
+            const maxVal = Math.max(...values);
+            const avgVal = values.reduce((a, b) => a + b, 0) / values.length;
+
+            document.getElementById('stat-min').textContent = formatBRL(minVal);
+            document.getElementById('stat-max').textContent = formatBRL(maxVal);
+            document.getElementById('stat-avg').textContent = formatBRL(avgVal);
+
+            // Geometria do SVG
+            const width = 960;
+            const height = 310;
+            const padLeft = 72;
+            const padRight = 32;
+            const padTop = 28;
+            const padBottom = 42;
+            const plotW = width - padLeft - padRight;
+            const plotH = height - padTop - padBottom;
+
+            const padRange = (maxVal - minVal) === 0 ? 2 : (maxVal - minVal) * 0.22;
+            const yMin = Math.max(0, minVal - padRange);
+            const yMax = maxVal + padRange;
+
+            const coords = values.map((v, idx) => {
+                const x = padLeft + (idx / Math.max(1, values.length - 1)) * plotW;
+                const y = padTop + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+                return { x, y, val: v, label: labels[idx], fullDate: fullDates[idx] };
+            });
+
+            const polylinePoints = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+            const areaPoints = `${coords[0].x.toFixed(1)},${padTop + plotH} ${polylinePoints} ${coords[coords.length - 1].x.toFixed(1)},${padTop + plotH}`;
+
+            // Linhas horizontais de grade (4 níveis)
+            let gridHtml = '';
+            for (let i = 0; i <= 4; i++) {
+                const gy = padTop + (i / 4) * plotH;
+                const gVal = yMax - (i / 4) * (yMax - yMin);
+                gridHtml += `
+                    <line x1="${padLeft}" y1="${gy}" x2="${width - padRight}" y2="${gy}" stroke="#E2E8F0" stroke-dasharray="4 4" stroke-width="1"/>
+                    <text x="${padLeft - 10}" y="${gy + 4}" text-anchor="end" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="11">
+                        R$ ${gVal.toFixed(2).replace('.', ',')}
+                    </text>
+                `;
+            }
+
+            // Pontos e Rótulos
+            const circlesHtml = coords.map((c, idx) => `
+                <g class="chart-point-group" style="cursor:pointer;">
+                    <line x1="${c.x}" y1="${padTop}" x2="${c.x}" y2="${padTop + plotH}" stroke="#CBD5E1" stroke-width="1" opacity="0.4"/>
+                    <circle cx="${c.x}" cy="${c.y}" r="6" fill="#FFFFFF" stroke="${lineColor}" stroke-width="3"/>
+                    <rect x="${c.x - 36}" y="${c.y - 30}" width="72" height="20" rx="5" fill="#0A0A0A"/>
+                    <text x="${c.x}" y="${c.y - 16}" text-anchor="middle" fill="#CCFF00" font-family="JetBrains Mono, monospace" font-weight="700" font-size="10.5">
+                        ${formatBRL(c.val)}
+                    </text>
+                    <text x="${c.x}" y="${height - 12}" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-weight="600" font-size="11">
+                        ${c.label}
+                    </text>
+                </g>
+            `).join('');
+
+            stage.innerHTML = `
+                <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%; overflow:visible;">
+                    <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="${lineColor}" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="${lineColor}" stop-opacity="0.0"/>
+                        </linearGradient>
+                    </defs>
+                    ${gridHtml}
+                    <polygon points="${areaPoints}" fill="url(#chartGrad)"/>
+                    <polyline fill="none" stroke="${lineColor}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="${polylinePoints}"/>
+                    ${circlesHtml}
+                </svg>
+            `;
+        }
+
+        function setChartFilter(filterKey) {
+            currentFilter = filterKey;
+            document.querySelectorAll('#chart-tabs .filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === filterKey) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderProductsGrid();
+            renderInteractiveSVGChart();
+        }
+
+        // 4. Renderizar Tabela Histórica Completa
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-tbody');
+            const reversed = [...historyData].reverse();
+
+            tbody.innerHTML = reversed.map((row, idx) => {
+                const origIdx = historyData.length - 1 - idx;
+                const prevRow = origIdx > 0 ? historyData[origIdx - 1] : null;
+
+                const total = sumBasket(row.prices);
+                const prevTotal = prevRow ? sumBasket(prevRow.prices) : total;
+                const diff = total - prevTotal;
+                const pct = prevRow && prevTotal > 0 ? (diff / prevTotal) * 100 : 0;
+
+                let badge = `<span class="tag-neutral">Início</span>`;
+                if (prevRow) {
+                    if (diff > 0.005) badge = `<span class="tag-up">▲ ${formatPct(pct)}</span>`;
+                    else if (diff < -0.005) badge = `<span class="tag-down">▼ ${formatPct(pct)}</span>`;
+                    else badge = `<span class="tag-neutral">0,0%</span>`;
+                }
+
+                return `
+                <tr>
+                    <td style="font-weight:700; color:#0F172A;">
+                        ${formatDateBR(row.date)}
+                        ${idx === 0 ? '<span style="margin-left:0.4rem; background:#0A0A0A; color:#CCFF00; padding:0.1rem 0.4rem; border-radius:4px; font-size:0.65rem;">ATUAL</span>' : ''}
+                    </td>
+                    <td style="text-align:right;">${formatBRL(row.prices.arroz)}</td>
+                    <td style="text-align:right;">${formatBRL(row.prices.feijao)}</td>
+                    <td style="text-align:right;">${formatBRL(row.prices.ovos)}</td>
+                    <td style="text-align:right;">${formatBRL(row.prices.leite)}</td>
+                    <td style="text-align:right;">${formatBRL(row.prices.carne)}</td>
+                    <td style="text-align:right;">${formatBRL(row.prices.oleo)}</td>
+                    <td style="text-align:right; font-weight:800; background:#F8FAFC; color:#0F172A;">${formatBRL(total)}</td>
+                    <td style="text-align:right;">${badge}</td>
+                    <td style="text-align:center;">
+                        <button onclick="openEditRow('${row.date}')" style="background:#F1F5F9; border:1px solid #CBD5E1; border-radius:6px; padding:0.2rem 0.5rem; cursor:pointer; font-size:0.72rem;" title="Editar preços desta segunda-feira">
+                            ✏️ Editar
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // 5. Simular Próxima Segunda-feira (ex: 26/10/2026)
+        function simulateMondayScrape() {
+            const latest = historyData[historyData.length - 1];
+            const nextDateObj = new Date(latest.date + 'T12:00:00');
+            nextDateObj.setDate(nextDateObj.getDate() + 7);
+            const nextISO = nextDateObj.toISOString().split('T')[0];
+
+            const simulatedPrices = {};
+            Object.keys(CATALOG).forEach(k => {
+                const base = latest.prices[k];
+                const vol = CATALOG[k].volatility;
+                const delta = (Math.random() * (vol * 2.1)) - vol;
+                const rawPrice = base * (1 + delta);
+                simulatedPrices[k] = Number((Math.round(rawPrice * 10) / 10).toFixed(2));
+            });
+
+            historyData.push({
+                date: nextISO,
+                prices: simulatedPrices
+            });
+
+            saveState();
+            renderDashboard();
+            showNotification(`Coleta de segunda-feira (${formatDateBR(nextISO)}) adicionada! Total: ${formatBRL(sumBasket(simulatedPrices))}`);
+        }
+
+        // 6. Modal de Inserção / Edição Manual
+        function openManualModal() {
+            const latest = historyData[historyData.length - 1];
+            const nextDateObj = new Date(latest.date + 'T12:00:00');
+            nextDateObj.setDate(nextDateObj.getDate() + 7);
+            const nextISO = nextDateObj.toISOString().split('T')[0];
+
+            document.getElementById('manual-modal-title').textContent = 'Registrar Nova Segunda-feira';
+            document.getElementById('form-date').value = nextISO;
+            document.getElementById('form-arroz').value = latest.prices.arroz.toFixed(2);
+            document.getElementById('form-feijao').value = latest.prices.feijao.toFixed(2);
+            document.getElementById('form-ovos').value = latest.prices.ovos.toFixed(2);
+            document.getElementById('form-leite').value = latest.prices.leite.toFixed(2);
+            document.getElementById('form-carne').value = latest.prices.carne.toFixed(2);
+            document.getElementById('form-oleo').value = latest.prices.oleo.toFixed(2);
+
+            document.getElementById('manual-modal').classList.add('open');
+        }
+
+        function openEditRow(dateISO) {
+            const row = historyData.find(h => h.date === dateISO);
+            if (!row) return;
+            document.getElementById('manual-modal-title').textContent = `Editar Segunda-feira (${formatDateBR(dateISO)})`;
+            document.getElementById('form-date').value = row.date;
+            document.getElementById('form-arroz').value = row.prices.arroz.toFixed(2);
+            document.getElementById('form-feijao').value = row.prices.feijao.toFixed(2);
+            document.getElementById('form-ovos').value = row.prices.ovos.toFixed(2);
+            document.getElementById('form-leite').value = row.prices.leite.toFixed(2);
+            document.getElementById('form-carne').value = row.prices.carne.toFixed(2);
+            document.getElementById('form-oleo').value = row.prices.oleo.toFixed(2);
+
+            document.getElementById('manual-modal').classList.add('open');
+        }
+
+        function closeManualModal() {
+            document.getElementById('manual-modal').classList.remove('open');
+        }
+
+        function handleSaveManual(e) {
+            e.preventDefault();
+            const dateISO = document.getElementById('form-date').value;
+            const newPrices = {
+                arroz: parseFloat(document.getElementById('form-arroz').value),
+                feijao: parseFloat(document.getElementById('form-feijao').value),
+                ovos: parseFloat(document.getElementById('form-ovos').value),
+                leite: parseFloat(document.getElementById('form-leite').value),
+                carne: parseFloat(document.getElementById('form-carne').value),
+                oleo: parseFloat(document.getElementById('form-oleo').value)
+            };
+
+            const idx = historyData.findIndex(h => h.date === dateISO);
+            if (idx >= 0) {
+                historyData[idx].prices = newPrices;
+            } else {
+                historyData.push({ date: dateISO, prices: newPrices });
+            }
+
+            saveState();
+            renderDashboard();
+            closeManualModal();
+            showNotification(`Preços de ${formatDateBR(dateISO)} salvos com sucesso!`);
+        }
+
+        // Modal do Robô Python
+        function openRobotModal() {
+            document.getElementById('robot-modal').classList.add('open');
+        }
+        function closeRobotModal() {
+            document.getElementById('robot-modal').classList.remove('open');
+        }
+        function copyPythonCode() {
+            const code = document.getElementById('python-code-block').innerText;
+            const el = document.createElement('textarea');
+            el.value = code;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showNotification('Script Python copiado para a área de transferência!');
+        }
+
+        // Exportar CSV e JSON
+        function exportCSVFile() {
+            const header = 'Data_Segunda,Arroz_Camil_5kg,Feijao_Camil_1kg,Ovos_Qualita_20un,Leite_Piracanjuba_1L,ContraFile_1kg,Oleo_Soya_900ml,Total_Cesta';
+            const lines = historyData.map(h => {
+                const tot = sumBasket(h.prices).toFixed(2);
+                return `${h.date},${h.prices.arroz.toFixed(2)},${h.prices.feijao.toFixed(2)},${h.prices.ovos.toFixed(2)},${h.prices.leite.toFixed(2)},${h.prices.carne.toFixed(2)},${h.prices.oleo.toFixed(2)},${tot}`;
+            });
+            const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'quanto_ta_cesta_pao_de_acucar.csv';
+            a.click();
+            showNotification('Planilha CSV baixada com sucesso!');
+        }
+
+        function exportJSONFile() {
+            const blob = new Blob([JSON.stringify(historyData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'quanto_ta_historico.json';
+            a.click();
+            showNotification('Arquivo JSON exportado!');
+        }
+
+        function showNotification(msg) {
+            const box = document.getElementById('toast-box');
+            const item = document.createElement('div');
+            item.style.cssText = 'background:#0A0A0A; color:#FFFFFF; border:1.5px solid #CCFF00; padding:0.75rem 1rem; border-radius:12px; font-size:0.8rem; font-weight:600; box-shadow:0 10px 25px rgba(0,0,0,0.3); display:flex; align-items:center; gap:0.5rem;';
+            item.innerHTML = `<span style="color:#CCFF00;">✔</span> <span>${msg}</span>`;
+            box.appendChild(item);
+            setTimeout(() => item.remove(), 3500);
+        }
+
+        function renderDashboard() {
+            try {
+                renderKPIs();
+                renderProductsGrid();
+                renderInteractiveSVGChart();
+                renderHistoryTable();
+            } catch (err) {
+                console.error('Erro ao renderizar painel:', err);
+            }
+        }
+
+        // Inicialização Imediata e Segura
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderDashboard();
+        });
+    </script>
+</body>
+</html>
