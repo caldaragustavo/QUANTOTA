@@ -1,1487 +1,231 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QUANTO TÁ — Radar Semanal da Cesta Básica (Pão de Açúcar)</title>
-
-    <!-- Tailwind CSS CDN (Com fallback CSS completo abaixo caso demore ou falhe) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- CSS Nativo Autocontido (Garante visual perfeito e zero tela branca mesmo offline) -->
-    <style>
-        :root {
-            --bg-page: #F4F6F9;
-            --bg-dark: #0A0A0A;
-            --bg-card: #FFFFFF;
-            --neon: #CCFF00;
-            --neon-hover: #b8e600;
-            --text-main: #0F172A;
-            --text-muted: #64748B;
-            --border-color: #E2E8F0;
-            --green: #10B981;
-            --green-bg: #ECFDF5;
-            --red: #F43F5E;
-            --red-bg: #FFF1F2;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .container-app {
-            max-width: 1280px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 1.25rem;
-        }
-
-        /* Top Status Bar */
-        .top-bar {
-            background-color: #050505;
-            color: #CBD5E1;
-            font-size: 0.75rem;
-            border-bottom: 1px solid #1E293B;
-            padding: 0.5rem 0;
-        }
-
-        .top-bar-inner {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-        }
-
-        .badge-neon {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            background: rgba(204, 255, 0, 0.14);
-            color: var(--neon);
-            border: 1px solid rgba(204, 255, 0, 0.35);
-            padding: 0.15rem 0.55rem;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.7rem;
-            letter-spacing: 0.03em;
-        }
-
-        .pulse-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background-color: var(--neon);
-            box-shadow: 0 0 8px var(--neon);
-            animation: pulseAnim 1.8s infinite;
-        }
-
-        @keyframes pulseAnim {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.45; transform: scale(0.85); }
-        }
-
-        /* Header */
-        .app-header {
-            background-color: var(--bg-dark);
-            color: #FFFFFF;
-            border-bottom: 1px solid #1F2937;
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        .header-inner {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 1rem 0;
-        }
-
-        .brand-wrap {
-            display: flex;
-            align-items: center;
-            gap: 0.9rem;
-        }
-
-        .logo-box {
-            width: 54px;
-            height: 54px;
-            border-radius: 14px;
-            background-color: #0A0A0A;
-            border: 1.5px solid #262626;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            box-shadow: 0 4px 14px rgba(204, 255, 0, 0.12);
-            flex-shrink: 0;
-        }
-
-        .brand-title {
-            font-size: 1.6rem;
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            color: #FFFFFF;
-            line-height: 1.1;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-        }
-
-        .brand-subtitle {
-            font-size: 0.8rem;
-            color: #94A3B8;
-            margin-top: 0.2rem;
-        }
-
-        /* Buttons */
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.55rem 0.9rem;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.18s ease;
-            border: 1px solid transparent;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .btn-neon {
-            background-color: var(--neon);
-            color: #0A0A0A;
-            border-color: #d9ff33;
-            box-shadow: 0 2px 10px rgba(204, 255, 0, 0.25);
-        }
-
-        .btn-neon:hover {
-            background-color: var(--neon-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-dark {
-            background-color: #18181B;
-            color: #F8FAFC;
-            border-color: #3F3F46;
-        }
-
-        .btn-dark:hover {
-            background-color: #27272A;
-            border-color: #52525B;
-        }
-
-        .btn-outline {
-            background-color: #FFFFFF;
-            color: #1E293B;
-            border-color: #CBD5E1;
-        }
-
-        .btn-outline:hover {
-            background-color: #F8FAFC;
-            border-color: #94A3B8;
-        }
-
-        /* Hero Banner & KPI Grid */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        @media (min-width: 640px) {
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 1024px) {
-            .kpi-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            padding: 1.25rem;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-            transition: all 0.2s ease;
-        }
-
-        .card-hero {
-            background: linear-gradient(145deg, #0A0A0A 0%, #18181B 100%);
-            color: #FFFFFF;
-            border: 2px solid var(--neon);
-            box-shadow: 0 8px 24px rgba(10, 10, 10, 0.14);
-            cursor: pointer;
-        }
-
-        /* Products 3x2 Grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            .products-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 1024px) {
-            .products-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        .product-card {
-            background: #FFFFFF;
-            border-radius: 16px;
-            border: 1.5px solid #E2E8F0;
-            padding: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
-            border-color: #94A3B8;
-        }
-
-        .product-card.active-card {
-            border: 2px solid #0A0A0A;
-            box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.55);
-        }
-
-        /* Filter Tabs */
-        .filter-pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            background: #F1F5F9;
-            padding: 0.35rem;
-            border-radius: 12px;
-            border: 1px solid #E2E8F0;
-        }
-
-        .filter-btn {
-            padding: 0.45rem 0.75rem;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #475569;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .filter-btn:hover {
-            color: #0F172A;
-            background: rgba(255,255,255,0.6);
-        }
-
-        .filter-btn.active {
-            background-color: #0A0A0A;
-            color: var(--neon);
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-
-        /* Table styles */
-        .table-wrap {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table.history-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        table.history-table th {
-            background-color: #F8FAFC;
-            color: #475569;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding: 0.85rem 1rem;
-            border-bottom: 1px solid #E2E8F0;
-            white-space: nowrap;
-        }
-
-        table.history-table td {
-            padding: 0.85rem 1rem;
-            border-bottom: 1px solid #F1F5F9;
-            font-size: 0.82rem;
-            white-space: nowrap;
-        }
-
-        table.history-table tr:hover td {
-            background-color: #F8FAFC;
-        }
-
-        /* Badges */
-        .tag-up {
-            background-color: var(--red-bg);
-            color: #E11D48;
-            border: 1px solid #FECDD3;
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.72rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-        }
-
-        .tag-down {
-            background-color: var(--green-bg);
-            color: #059669;
-            border: 1px solid #A7F3D0;
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.72rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-        }
-
-        .tag-neutral {
-            background-color: #F1F5F9;
-            color: #475569;
-            border: 1px solid #E2E8F0;
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.72rem;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        /* Modal Backdrop */
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 10, 10, 0.75);
-            backdrop-filter: blur(4px);
-            z-index: 60;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .modal-backdrop.open {
-            display: flex;
-        }
-
-        .modal-box {
-            background: #FFFFFF;
-            border-radius: 18px;
-            max-width: 850px;
-            width: 100%;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
-            border: 1px solid #334155;
-        }
-
-        /* Toast */
-        #toast-box {
-            position: fixed;
-            bottom: 1.25rem;
-            right: 1.25rem;
-            z-index: 80;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>QUANTO TÁ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" type="image/png" href="logo.png">
+<meta name="description" content="Registro semanal dos preços da cesta básica no Pão de Açúcar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: uma coluna estreita — resumo da semana no topo, um cartão por item, depois o histórico completo */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#18201b; --muted:#5d6a62; --line:#dde3dd;
+  --accent:#1f6b4a; --up:#b4382c; --down:#1f7a45; --flat:#6b736e;
+  --c-arroz:#c08a1e; --c-feijao:#8a4b2c; --c-ovos:#d0652a; --c-leite:#3a78c2; --c-oleo:#8a6fc9; --c-acem:#b8344f;  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1a201d; --ink:#e7ece8; --muted:#97a39c; --line:#2b332f;
+  --accent:#5cc497; --up:#f07a6c; --down:#5cc48a; --flat:#8d968f;
+  --c-arroz:#e3b450; --c-feijao:#c98a66; --c-ovos:#f0905a; --c-leite:#78aef0; --c-oleo:#b5a0ee; --c-acem:#ef7a92; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a201d; --ink:#e7ece8; --muted:#97a39c; --line:#2b332f;
+  --accent:#5cc497; --up:#f07a6c; --down:#5cc48a; --flat:#8d968f;
+  --c-arroz:#e3b450; --c-feijao:#c98a66; --c-ovos:#f0905a; --c-leite:#78aef0; --c-oleo:#b5a0ee; --c-acem:#ef7a92; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:760px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+.wrap>section{min-width:0;grid-template-columns:minmax(0,1fr)}
+header{display:grid;gap:6px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.brand{display:flex;align-items:center;gap:14px}
+.brand img{width:64px;height:64px;flex:none;border-radius:14px}
+.brand-txt{display:grid;gap:4px;min-width:0}
+h1{font:800 clamp(30px,7vw,46px)/1.05 var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0;max-width:60ch}
+.total{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding-block:18px;border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.total .lbl{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);flex-basis:100%}
+.total .val{font:800 clamp(34px,8vw,52px)/1 var(--display);font-variant-numeric:tabular-nums}
+.chip{font:500 13px var(--mono);padding:3px 8px;border-radius:4px;border:1px solid currentColor;white-space:nowrap}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--flat)}
+h2{font:600 20px var(--display);margin:0}
+.items{display:grid;gap:10px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:center}
+.item .name{font-weight:600}
+.item .spec{color:var(--muted);font-size:13px}
+.item .spec a{color:inherit}
+.item .price{font:500 22px var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.item .unit{font-size:12px;color:var(--muted)}
+.item .meta{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.item svg{width:160px;height:34px;max-width:100%;overflow:visible}
+.na{color:var(--muted);font:500 13px var(--mono)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px;font:400 14px var(--mono);font-variant-numeric:tabular-nums}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+th:first-child,td:first-child{text-align:left}
+tr:last-child td{border-bottom:0}
+td small{display:block;font-size:11px}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:24px;color:var(--muted)}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 12px 10px;display:grid;gap:10px}
+.chart svg{width:100%;height:auto;display:block}
+.ax{fill:var(--muted);font:11px var(--mono)}
+@media (max-width:560px){.ax{font-size:17px}}
+.chart .note{color:var(--muted);font-size:13px;margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px}
+.legend button{font:500 13px var(--body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.legend button .sw{width:14px;height:3px;border-radius:2px;background:var(--sw)}
+.legend button[aria-pressed="false"]{color:var(--muted);opacity:.55}
+.legend button[aria-pressed="false"] .sw{background:var(--line)}
+.legend button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{color:var(--muted);font-size:13px;display:grid;gap:6px}
+footer p{margin:0}
+</style>
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
-    <!-- 1. BARRA SUPERIOR DE STATUS (OUTUBRO 2026) -->
-    <div class="top-bar">
-        <div class="container-app top-bar-inner">
-            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-                <span class="badge-neon font-mono">
-                    <span class="pulse-dot"></span>
-                    COLETOR ATIVO: SEGUNDAS 08:00 BRT
-                </span>
-                <span style="color:#94A3B8; font-size:0.74rem;" class="font-mono">
-                    📍 Supermercado Pão de Açúcar — Loja #001 (Jardim Paulista, SP)
-                </span>
-            </div>
-            <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;" class="font-mono">
-                <span id="status-last-monday" style="color:#F8FAFC; font-weight:600;">Última segunda: 19/10/2026</span>
-                <span style="color:#475569;">|</span>
-                <span id="status-next-monday" style="color:#CCFF00; font-weight:600;">Próxima coleta: 26/10/2026 às 08:00</span>
-                <button onclick="resetToDefault2026()" style="background:transparent; border:none; color:#94A3B8; text-decoration:underline; cursor:pointer; font-size:0.72rem;" title="Restaurar as 8 segundas-feiras padrão de 2026">
-                    Resetar Dados
-                </button>
-            </div>
-        </div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="data:image/png;base64,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" alt="" width="64" height="64">
+      <div class="brand-txt">
+        <span class="eyebrow">Pão de Açúcar · registro semanal</span>
+        <h1>QUANTO TÁ</h1>
+      </div>
     </div>
+    <p class="sub">Arroz, feijão, ovos, leite, óleo e carne, sempre a mesma marca e o mesmo site. Atualiza toda segunda de manhã; as semanas anteriores ficam guardadas.</p>
+  </header>
 
-    <!-- 2. CABEÇALHO PRINCIPAL COM O LOGO "QUANTO TÁ" -->
-    <header class="app-header">
-        <div class="container-app header-inner">
-            <!-- Brand & Custom SVG Cart Icon -->
-            <div class="brand-wrap">
-                <div class="logo-box" title="QUANTO TÁ - Monitor Semanal de Preços">
-                    <svg viewBox="0 0 100 100" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo QUANTO TÁ">
-                        <rect width="100" height="100" rx="22" fill="#0A0A0A"/>
-                        <!-- Alça e Cesto do Carrinho em Verde-Lima Neon (#CCFF00) -->
-                        <path d="M12 22L24 25L35 63H77C80 63 82.2 61 83 58L88 33.5C88.7 30.5 86.5 28 83.5 28H25.5" stroke="#CCFF00" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-                        <!-- Grades do Carrinho -->
-                        <line x1="39" y1="28.5" x2="44" y2="62.5" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
-                        <line x1="75.5" y1="28.5" x2="70" y2="62.5" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
-                        <line x1="29" y1="40.5" x2="86" y2="40.5" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
-                        <line x1="32" y1="52" x2="83.5" y2="52" stroke="#CCFF00" stroke-width="3.8" stroke-linecap="round"/>
-                        <!-- Curva Inferior do Chassi -->
-                        <path d="M37 63C31 63 30.5 73.5 37.5 73.5H78" stroke="#CCFF00" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <!-- Rodinhas -->
-                        <circle cx="42" cy="83" r="6" stroke="#CCFF00" stroke-width="4.8" fill="#0A0A0A"/>
-                        <circle cx="71" cy="83" r="6" stroke="#CCFF00" stroke-width="4.8" fill="#0A0A0A"/>
-                        <!-- Círculo Central com Cifrão ($) -->
-                        <circle cx="57" cy="45.5" r="15" fill="#CCFF00"/>
-                        <text x="57" y="52.5" text-anchor="middle" fill="#0A0A0A" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="22">$</text>
-                    </svg>
-                </div>
-                <div>
-                    <div class="brand-title">
-                        <span>QUANTO TÁ</span>
-                        <span style="font-size:0.7rem; background:#1E293B; color:#CCFF00; border:1px solid #334155; padding:0.2rem 0.55rem; border-radius:6px; font-weight:700; letter-spacing:0.04em;" class="font-mono">
-                            PÃO DE AÇÚCAR • 6 ITENS FIXOS
-                        </span>
-                    </div>
-                    <p class="brand-subtitle">
-                        Monitoramento histórico toda segunda-feira • Mesma marca, mesmo peso e mesmo SKU
-                    </p>
-                </div>
-            </div>
+  <section class="total" id="total" aria-live="polite">
+    <span class="lbl" id="totalLbl">Carregando registros…</span>
+    <span class="val" id="totalVal">—</span>
+    <span id="totalChg"></span>
+  </section>
 
-            <!-- Action Buttons -->
-            <div class="btn-group">
-                <button onclick="simulateMondayScrape()" class="btn btn-neon">
-                    <span>⚡ Simular Coleta de Segunda-feira</span>
-                </button>
-                <button onclick="openManualModal()" class="btn btn-dark">
-                    <span>＋ Inserir Preços</span>
-                </button>
-                <button onclick="openRobotModal()" class="btn btn-dark" style="border-color:#CCFF00; color:#CCFF00;">
-                    <span>🤖 Robô Python (GitHub)</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- 3. CONTEÚDO PRINCIPAL -->
-    <main class="container-app" style="flex:1; padding-bottom: 3rem;">
-
-        <!-- KPIs / Resumo Executivo -->
-        <section class="kpi-grid" aria-label="Resumo da Semana">
-            <!-- Card 1: Custo Total da Cesta -->
-            <div class="card card-hero" onclick="setChartFilter('total')" title="Clique para ver o gráfico da cesta completa">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-                    <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#CCFF00; font-weight:700; letter-spacing:0.05em;">
-                        Custo Total (6 Itens)
-                    </span>
-                    <span id="kpi-date-pill" class="font-mono" style="font-size:0.7rem; background:rgba(255,255,255,0.12); padding:0.1rem 0.45rem; border-radius:4px; color:#E2E8F0;">
-                        19/10/2026
-                    </span>
-                </div>
-                <div id="kpi-total-value" class="font-mono" style="font-size:2.1rem; font-weight:800; letter-spacing:-0.03em; color:#FFFFFF; margin:0.2rem 0;">
-                    R$ 132,34
-                </div>
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid rgba(255,255,255,0.12);">
-                    <span id="kpi-weekly-tag" class="tag-down">▼ -0,4%</span>
-                    <span style="font-size:0.72rem; color:#94A3B8;">vs. segunda anterior</span>
-                </div>
-            </div>
-
-            <!-- Card 2: Variação Acumulada desde 31/08/2026 -->
-            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
-                <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-                        <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#64748B; font-weight:700;">
-                            Inflação Acumulada
-                        </span>
-                        <span id="kpi-weeks-badge" class="font-mono" style="font-size:0.7rem; background:#F1F5F9; color:#334155; padding:0.1rem 0.45rem; border-radius:4px; font-weight:600;">
-                            8 segundas
-                        </span>
-                    </div>
-                    <div style="display:flex; align-items:baseline; gap:0.5rem; margin:0.35rem 0;">
-                        <span id="kpi-acc-pct" class="font-mono" style="font-size:1.75rem; font-weight:800; color:#E11D48;">+4,8%</span>
-                        <span id="kpi-acc-brl" class="font-mono" style="font-size:0.82rem; color:#64748B;">(+R$ 6,07)</span>
-                    </div>
-                </div>
-                <div style="margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid #F1F5F9; display:flex; justify-content:space-between; font-size:0.74rem; color:#64748B;">
-                    <span>Início da série: <strong id="kpi-start-date" class="font-mono" style="color:#0F172A;">31/08/2026</strong></span>
-                    <span id="kpi-min-max-summary" class="font-mono">Mín: R$ 126,27</span>
-                </div>
-            </div>
-
-            <!-- Card 3: Vilão da Semana (Maior Alta) -->
-            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
-                <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-                        <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#E11D48; font-weight:700;">
-                            🔥 Maior Alta da Semana
-                        </span>
-                        <span style="font-size:0.65rem; background:#FFF1F2; color:#E11D48; border:1px solid #FECDD3; padding:0.1rem 0.4rem; border-radius:4px; font-weight:700;">
-                            VILÃO
-                        </span>
-                    </div>
-                    <div id="kpi-villain-name" style="font-weight:700; font-size:0.95rem; color:#0F172A; margin-top:0.25rem;">
-                        Contra Filé Bovino 1kg
-                    </div>
-                    <div id="kpi-villain-brand" style="font-size:0.74rem; color:#64748B;">
-                        Marca Fixa: Pão de Açúcar (#SKU-330419)
-                    </div>
-                </div>
-                <div style="margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid #F1F5F9; display:flex; justify-content:space-between; align-items:center;">
-                    <span id="kpi-villain-badge" class="tag-up font-mono">▲ +2,2%</span>
-                    <span id="kpi-villain-price" class="font-mono" style="font-size:0.85rem; font-weight:700; color:#0F172A;">R$ 57,90</span>
-                </div>
-            </div>
-
-            <!-- Card 4: Alívio da Semana (Maior Queda) -->
-            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
-                <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-                        <span class="font-mono" style="font-size:0.72rem; text-transform:uppercase; color:#059669; font-weight:700;">
-                            📉 Maior Queda / Economia
-                        </span>
-                        <span style="font-size:0.65rem; background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; padding:0.1rem 0.4rem; border-radius:4px; font-weight:700;">
-                            ALÍVIO
-                        </span>
-                    </div>
-                    <div id="kpi-relief-name" style="font-weight:700; font-size:0.95rem; color:#0F172A; margin-top:0.25rem;">
-                        Leite Integral Piracanjuba 1L
-                    </div>
-                    <div id="kpi-relief-brand" style="font-size:0.74rem; color:#64748B;">
-                        Marca Fixa: Piracanjuba (#SKU-190344)
-                    </div>
-                </div>
-                <div style="margin-top:0.65rem; padding-top:0.65rem; border-top:1px solid #F1F5F9; display:flex; justify-content:space-between; align-items:center;">
-                    <span id="kpi-relief-badge" class="tag-down font-mono">▼ -3,2%</span>
-                    <span id="kpi-relief-price" class="font-mono" style="font-size:0.85rem; font-weight:700; color:#0F172A;">R$ 5,99</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção 2: Os 6 Produtos de Marca e SKU Travados -->
-        <section style="margin-top: 2.25rem;">
-            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0.75rem; margin-bottom:1rem;">
-                <div>
-                    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-                        <h2 style="font-size:1.2rem; font-weight:800; color:#0F172A;">
-                            Cesta Básica Fixa — 6 Produtos Monitorados
-                        </h2>
-                        <span class="font-mono" style="font-size:0.72rem; background:#ECFDF5; color:#065F46; border:1px solid #6EE7B7; padding:0.2rem 0.6rem; border-radius:999px; font-weight:700;">
-                            🔒 Trava de Marca & SKU Ativa
-                        </span>
-                    </div>
-                    <p style="font-size:0.8rem; color:#64748B; margin-top:0.15rem;">
-                        Clique em qualquer produto abaixo para isolar a linha do tempo dele no gráfico semanal.
-                    </p>
-                </div>
-                <div class="font-mono" style="font-size:0.73rem; background:#FFFFFF; padding:0.45rem 0.8rem; border-radius:10px; border:1px solid #E2E8F0; color:#334155;">
-                    ✅ Sempre os mesmos 6 SKUs do Pão de Açúcar
-                </div>
-            </div>
-
-            <!-- Grid 3x2 dos 6 Produtos -->
-            <div id="products-cards-container" class="products-grid">
-                <!-- Preenchido via JS na inicialização -->
-            </div>
-        </section>
-
-        <!-- Seção 3: Gráfico Interativo de Evolução Semanal -->
-        <section class="card" style="margin-top: 2.25rem; padding: 1.5rem;">
-            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:1.1rem; border-bottom:1px solid #F1F5F9;">
-                <div>
-                    <div style="display:flex; align-items:center; gap:0.5rem;">
-                        <span id="chart-dot" style="width:11px; height:11px; border-radius:50%; background:#059669; display:inline-block;"></span>
-                        <h2 id="chart-main-title" style="font-size:1.15rem; font-weight:800; color:#0F172A;">
-                            Evolução Semanal — Cesta Completa (6 Itens)
-                        </h2>
-                    </div>
-                    <p id="chart-sub-title" style="font-size:0.8rem; color:#64748B; margin-top:0.2rem;">
-                        Histórico de todas as segundas-feiras registradas (31/08/2026 até 19/10/2026)
-                    </p>
-                </div>
-
-                <!-- Abas de Filtro do Gráfico -->
-                <div class="filter-pills" id="chart-tabs">
-                    <button onclick="setChartFilter('total')" data-filter="total" class="filter-btn active">Cesta Completa (Total)</button>
-                    <button onclick="setChartFilter('arroz')" data-filter="arroz" class="filter-btn">Arroz Camil 5kg</button>
-                    <button onclick="setChartFilter('feijao')" data-filter="feijao" class="filter-btn">Feijão Camil 1kg</button>
-                    <button onclick="setChartFilter('ovos')" data-filter="ovos" class="filter-btn">Ovos Qualitá 20un</button>
-                    <button onclick="setChartFilter('leite')" data-filter="leite" class="filter-btn">Leite Pirac. 1L</button>
-                    <button onclick="setChartFilter('carne')" data-filter="carne" class="filter-btn">Contra Filé 1kg</button>
-                    <button onclick="setChartFilter('oleo')" data-filter="oleo" class="filter-btn">Óleo Soya 900ml</button>
-                </div>
-            </div>
-
-            <!-- Área do Gráfico Interativo SVG Nativo (Ultra Rápido, Responsivo e Nunca Falha) -->
-            <div id="interactive-chart-stage" style="width:100%; height:330px; margin-top:1.25rem; position:relative;">
-                <!-- Renderizado via JS -->
-            </div>
-
-            <!-- Rodapé Estatístico do Gráfico -->
-            <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #F1F5F9; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; font-size:0.78rem; color:#64748B;">
-                <div style="display:flex; flex-wrap:wrap; gap:1.25rem;">
-                    <span>🟢 Menor preço registrado: <strong id="stat-min" class="font-mono" style="color:#0F172A;">--</strong></span>
-                    <span>🔴 Maior preço registrado: <strong id="stat-max" class="font-mono" style="color:#0F172A;">--</strong></span>
-                    <span>📊 Média das segundas: <strong id="stat-avg" class="font-mono" style="color:#0F172A;">--</strong></span>
-                </div>
-                <div class="font-mono" style="font-size:0.72rem; color:#94A3B8;">
-                    Passe o mouse sobre os pontos para inspecionar cada segunda-feira
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção 4: Tabela Histórica Completa de Segundas-feiras -->
-        <section class="card" style="margin-top: 2.25rem; padding: 0; overflow: hidden;">
-            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #E2E8F0; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;">
-                <div>
-                    <h2 style="font-size:1.15rem; font-weight:800; color:#0F172A;">
-                        Registro Histórico de Segundas-feiras
-                    </h2>
-                    <p style="font-size:0.8rem; color:#64748B; margin-top:0.15rem;">
-                        Os preços das segundas-feiras passadas ficam salvos permanentemente para comparação.
-                    </p>
-                </div>
-                <div style="display:flex; gap:0.5rem;">
-                    <button onclick="exportCSVFile()" class="btn btn-outline font-mono" style="font-size:0.75rem;">
-                        📥 Baixar Planilha CSV
-                    </button>
-                    <button onclick="exportJSONFile()" class="btn btn-outline font-mono" style="font-size:0.75rem;">
-                        { } Exportar JSON
-                    </button>
-                </div>
-            </div>
-
-            <div class="table-wrap">
-                <table class="history-table font-mono">
-                    <thead>
-                        <tr>
-                            <th>Segunda-feira</th>
-                            <th style="text-align:right;">Arroz Camil 5kg</th>
-                            <th style="text-align:right;">Feijão Camil 1kg</th>
-                            <th style="text-align:right;">Ovos Qualitá 20un</th>
-                            <th style="text-align:right;">Leite Pirac. 1L</th>
-                            <th style="text-align:right;">Contra Filé 1kg</th>
-                            <th style="text-align:right;">Óleo Soya 900ml</th>
-                            <th style="text-align:right; background:#F1F5F9; color:#0F172A;">Total Cesta</th>
-                            <th style="text-align:right;">Var. Semanal</th>
-                            <th style="text-align:center;">Editar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-tbody">
-                        <!-- Preenchido via JS -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Rodapé -->
-    <footer style="background:#0A0A0A; color:#94A3B8; padding:1.75rem 0; border-top:1px solid #1E293B; margin-top:auto; font-size:0.78rem;">
-        <div class="container-app" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;">
-            <div style="display:flex; align-items:center; gap:0.65rem;">
-                <span style="display:inline-flex; width:24px; height:24px; background:#18181B; border:1px solid #334155; border-radius:6px; align-items:center; justify-content:center; color:#CCFF00; font-weight:900;">$</span>
-                <strong style="color:#FFFFFF; letter-spacing:-0.02em;">QUANTO TÁ</strong>
-                <span>— Monitor Semanal da Cesta Básica no Supermercado Pão de Açúcar.</span>
-            </div>
-            <div class="font-mono" style="font-size:0.72rem; color:#64748B;">
-                Atualizado em Outubro/2026 • 6 SKUs Travados
-            </div>
-        </div>
-    </footer>
-
-    <!-- Container de Notificações (Toast) -->
-    <div id="toast-box"></div>
-
-    <!-- MODAL 1: INSERIR / EDITAR PREÇOS MANUALMENTE -->
-    <div id="manual-modal" class="modal-backdrop">
-        <div class="modal-box" style="max-width:540px;">
-            <div style="background:#0A0A0A; color:#FFFFFF; padding:1rem 1.4rem; display:flex; align-items:center; justify-content:space-between;">
-                <h3 id="manual-modal-title" style="font-weight:800; font-size:1rem; color:#CCFF00;">
-                    Registrar Coleta de Segunda-feira
-                </h3>
-                <button onclick="closeManualModal()" style="background:transparent; border:none; color:#94A3B8; font-size:1.3rem; cursor:pointer;">✕</button>
-            </div>
-            <form onsubmit="handleSaveManual(event)" style="padding:1.4rem; overflow-y:auto;">
-                <div style="margin-bottom:1rem;">
-                    <label class="font-mono" style="display:block; font-size:0.73rem; font-weight:700; color:#475569; margin-bottom:0.3rem; text-transform:uppercase;">
-                        Data da Segunda-feira
-                    </label>
-                    <input type="date" id="form-date" required class="font-mono" style="width:100%; padding:0.55rem 0.75rem; border:1px solid #CBD5E1; border-radius:8px; font-size:0.9rem;">
-                </div>
-
-                <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:0.85rem;">
-                    <div>
-                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Arroz Camil 5kg (R$)</label>
-                        <input type="number" step="0.01" min="1" id="form-arroz" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Feijão Camil 1kg (R$)</label>
-                        <input type="number" step="0.01" min="1" id="form-feijao" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Ovos Qualitá 20un (R$)</label>
-                        <input type="number" step="0.01" min="1" id="form-ovos" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Leite Piracanjuba 1L (R$)</label>
-                        <input type="number" step="0.01" min="1" id="form-leite" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Contra Filé 1kg (R$)</label>
-                        <input type="number" step="0.01" min="1" id="form-carne" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:0.76rem; font-weight:600; color:#1E293B; margin-bottom:0.25rem;">Óleo Soya 900ml (R$)</label>
-                        <input type="number" step="0.01" min="1" id="form-oleo" required class="font-mono" style="width:100%; padding:0.5rem; border:1px solid #CBD5E1; border-radius:8px;">
-                    </div>
-                </div>
-
-                <div style="margin-top:1.4rem; padding-top:1rem; border-top:1px solid #E2E8F0; display:flex; justify-content:flex-end; gap:0.6rem;">
-                    <button type="button" onclick="closeManualModal()" class="btn btn-outline">Cancelar</button>
-                    <button type="submit" class="btn btn-neon">Salvar Segunda-feira</button>
-                </div>
-            </form>
-        </div>
+  <section style="display:grid;gap:12px">
+    <h2>Variação desde a primeira semana</h2>
+    <div class="chart">
+      <div class="legend" id="legend"></div>
+      <div id="chartBox" style="overflow-x:auto"></div>
+      <p class="note" id="chartNote">Cada ponto mostra quanto o preço está acima (+) ou abaixo (−) do valor da primeira coleta.</p>
     </div>
+  </section>
 
-    <!-- MODAL 2: CÓDIGO DO ROBÔ PYTHON + GITHUB ACTIONS -->
-    <div id="robot-modal" class="modal-backdrop">
-        <div class="modal-box">
-            <div style="background:#0A0A0A; color:#FFFFFF; padding:1rem 1.4rem; display:flex; align-items:center; justify-content:space-between;">
-                <div>
-                    <h3 style="font-weight:800; font-size:1rem; color:#CCFF00;">
-                        🤖 Automação Semanal — Python + GitHub Actions (Custo Zero)
-                    </h3>
-                    <p style="font-size:0.75rem; color:#94A3B8;">
-                        Roda toda segunda-feira às 08:00 BRT buscando sempre os mesmos 6 SKUs no Pão de Açúcar
-                    </p>
-                </div>
-                <button onclick="closeRobotModal()" style="background:transparent; border:none; color:#94A3B8; font-size:1.3rem; cursor:pointer;">✕</button>
-            </div>
+  <section style="display:grid;gap:12px">
+    <h2>Esta semana</h2>
+    <div class="items" id="items"></div>
+  </section>
 
-            <div style="padding:1.25rem; background:#0F172A; color:#E2E8F0; overflow-y:auto; flex:1;" class="font-mono">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <span style="color:#CCFF00; font-size:0.78rem; font-weight:700;">📄 scraper_pao_de_acucar.py (Com os 6 SKUs Travados)</span>
-                    <button onclick="copyPythonCode()" class="btn btn-neon" style="padding:0.3rem 0.7rem; font-size:0.72rem;">Copiar Código</button>
-                </div>
-                <pre id="python-code-block" style="background:#050505; padding:1rem; border-radius:10px; border:1px solid #1E293B; font-size:0.74rem; overflow-x:auto; color:#A7F3D0; line-height:1.55;"># scraper_pao_de_acucar.py — QUANTO TÁ (Toda Segunda-feira às 08h00)
-import json, datetime, urllib.request, urllib.parse
-from pathlib import Path
+  <section style="display:grid;gap:12px">
+    <h2>Histórico</h2>
+    <div id="hist"></div>
+  </section>
 
-PRODUTOS_TRAVADOS = {
-    "arroz":  {"sku": "SKU-154820", "termo": "Arroz Agulhinha Tipo 1 Camil 5kg", "fallback": 29.90},
-    "feijao": {"sku": "SKU-158932", "termo": "Feijao Carioca Tipo 1 Camil 1kg", "fallback": 8.49},
-    "ovos":   {"sku": "SKU-298410", "termo": "Ovos Brancos Grandes Qualita 20 unidades", "fallback": 21.90},
-    "leite":  {"sku": "SKU-190344", "termo": "Leite Longa Vida Integral Piracanjuba 1l", "fallback": 5.99},
-    "carne":  {"sku": "SKU-330419", "termo": "Contra File Bovino Resfriado Pao de Acucar kg", "fallback": 57.90},
-    "oleo":   {"sku": "SKU-112850", "termo": "Oleo de Soja Soya Garrafa 900ml", "fallback": 8.16}
+  <footer>
+    <p>Total da cesta = 1 pacote de arroz 5 kg + 1 kg de feijão + 1 dúzia de ovos + 1 L de leite + 1 garrafa de óleo 900 ml + 1 kg de acém.</p>
+    <p>Preços do site em São Paulo, sem cupom ou "Meu Desconto". A carne é vendida por peso; o registro usa o preço por kg.</p>  </footer>
+</div>
+
+<script>
+const ITENS=[
+  {k:"arroz",nome:"Arroz",spec:"Camil agulhinha tipo 1 · 5 kg",un:"pacote",url:"https://www.paodeacucar.com/produto/41329/arroz-agulhinha-tipo-1-camil-pacote-5kg"},
+  {k:"feijao",nome:"Feijão",spec:"Camil carioca tipo 1 · 1 kg",un:"pacote",url:"https://www.paodeacucar.com/produto/9461/feijao-carioca-tipo-1-camil-pacote-1kg"},
+  {k:"ovos",nome:"Ovos",spec:"Brancos grandes · bandeja 12 un.",un:"dúzia",url:"https://www.paodeacucar.com/produto/123706/ovos-branco-grandes-bandeja-com-12-unidades"},
+  {k:"leite",nome:"Leite",spec:"Italac integral longa vida · 1 L",un:"litro",url:"https://www.paodeacucar.com/produto/176191/leite-longa-vida-integral--italac-1-litro"},
+  {k:"oleo",nome:"Óleo",spec:"Liza soja tipo 1 · garrafa 900 ml",un:"garrafa",url:"https://www.paodeacucar.com/produto/131661/oleo-de-soja-liza-pet-900ml"},
+  {k:"acem",nome:"Carne (acém)",spec:"Acém em pedaço resfriado Bandeiras",un:"kg",url:"https://www.paodeacucar.com/produto/133819/acem-em-pedaco-resfriado-bandeja-600g"}
+];
+const brl=v=>v==null?"—":v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const fmtData=s=>{const[y,m,d]=s.split("-");return `${d}/${m}/${y}`};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function chg(cur,prev){
+  if(cur==null||prev==null)return "";
+  const d=cur-prev; if(Math.abs(d)<0.005)return `<span class="chip flat">= estável</span>`;
+  const p=(d/prev*100).toLocaleString("pt-BR",{maximumFractionDigits:1});
+  return `<span class="chip ${d>0?"up":"down"}">${d>0?"▲ +":"▼ "}${brl(d).replace("R$","R$ ")} (${d>0?"+":""}${p}%)</span>`;
 }
+function total(r){let t=0;for(const i of ITENS){if(r[i.k]==null)return null;t+=r[i.k]}return Math.round(t*100)/100}
+function spark(vals){
+  const pts=vals.map((v,i)=>[i,v]).filter(p=>p[1]!=null);
+  if(pts.length<2)return `<span class="na">gráfico a partir da 2ª semana</span>`;
+  const W=160,H=34,n=vals.length-1||1,ys=pts.map(p=>p[1]),mn=Math.min(...ys),mx=Math.max(...ys),r=mx-mn||1;
+  const xy=pts.map(([i,v])=>[i/n*W,H-3-(v-mn)/r*(H-6)]);
+  const d=xy.map((p,j)=>(j?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const last=xy[xy.length-1];
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução do preço"><path d="${d}" style="fill:none;stroke:var(--accent)" stroke-width="2" stroke-linejoin="round"/><circle cx="${last[0]}" cy="${last[1]}" r="3.5" style="fill:var(--accent)"/></svg>`;
+}
+const SERIES=[{k:"total",nome:"Cesta total",cor:"var(--ink)",w:3.5},...ITENS.map(i=>({k:i.k,nome:i.nome.replace(" (acém)",""),cor:`var(--c-${i.k})`,w:2}))];
+const visivel=new Set(SERIES.map(s=>s.k));
+let ultimas=[];
+const pctTxt=v=>(v>0?"+":v<0?"−":"")+Math.abs(v).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
+function serieVals(rows,k){return rows.map(r=>k==="total"?total(r):(r[k]??null))}
+function drawChart(rows){
+  const leg=document.getElementById("legend"),box=document.getElementById("chartBox");
+  leg.innerHTML=SERIES.map(s=>`<button type="button" id="lg-${s.k}" data-k="${s.k}" aria-pressed="${visivel.has(s.k)}" style="--sw:${s.cor}"><span class="sw"></span>${s.nome}</button>`).join("");
+  const W=680,H=280,L=52,R=16,T=14,B=34,pw=W-L-R,ph=H-T-B;
+  const n=rows.length;
+  const linhas=SERIES.filter(s=>visivel.has(s.k)).map(s=>{
+    const vals=serieVals(rows,s.k);const base=vals.find(v=>v!=null);
+    return {...s,pts:vals.map((v,i)=>v==null||base==null?null:[i,(v/base-1)*100])};
+  });
+  const ys=[0];linhas.forEach(l=>l.pts.forEach(p=>p&&ys.push(p[1])));
+  let mn=Math.min(...ys),mx=Math.max(...ys);
+  const span=Math.max(mx-mn,4);
+  const step=[0.5,1,2,5,10,20,50].find(s=>span/s<=6)||100;
+  mn=Math.floor(Math.min(mn,-step)/step)*step; mx=Math.ceil(Math.max(mx,step)/step)*step;
+  const x=i=>L+(n<=1?pw/2:i/(n-1)*pw), y=v=>T+(mx-v)/(mx-mn)*ph;
+  let g="";
+  for(let v=mn;v<=mx+1e-9;v+=step){
+    const yy=y(v).toFixed(1);
+    g+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" style="stroke:${Math.abs(v)<1e-9?"var(--muted)":"var(--line)"}" stroke-width="${Math.abs(v)<1e-9?1.2:1}"${Math.abs(v)<1e-9?' stroke-dasharray="4 3"':""}/>`;
+    g+=`<text x="${L-8}" y="${(+yy+4).toFixed(1)}" text-anchor="end" class="ax">${Math.abs(v)<1e-9?"0%":pctTxt(+v.toFixed(2))}</text>`;
+  }
+  const cada=Math.max(1,Math.ceil(n/8));
+  rows.forEach((r,i)=>{if(i%cada&&i!==n-1)return;const[,m,d]=r.data.split("-");
+    g+=`<text x="${x(i).toFixed(1)}" y="${H-12}" text-anchor="middle" class="ax">${d}/${m}</text>`});
+  let ls="";
+  linhas.slice().reverse().forEach(l=>{
+    const pts=l.pts.filter(Boolean);
+    if(pts.length>1)ls+=`<path d="${pts.map((p,j)=>(j?"L":"M")+x(p[0]).toFixed(1)+" "+y(p[1]).toFixed(1)).join(" ")}" style="fill:none;stroke:${l.cor}" stroke-width="${l.w}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const last=pts[pts.length-1];
+    if(last)ls+=`<circle cx="${x(last[0]).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="${l.k==="total"?5:3.5}" style="fill:${l.cor};stroke:var(--surface)" stroke-width="1.5"><title>${l.nome}: ${pctTxt(last[1])}</title></circle>`;
+  });
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Variação percentual dos preços desde a primeira semana">${g}${ls}</svg>`;
+  const tot=linhas.find(l=>l.k==="total"),ult=tot&&tot.pts.filter(Boolean).pop();
+  document.getElementById("chartNote").textContent=n<2
+    ?"As linhas começam a aparecer a partir da segunda coleta. Por enquanto, a primeira semana é o ponto zero."
+    :`Desde ${fmtData(rows[0].data)}${ult?`, a cesta total variou ${pctTxt(ult[1])}`:""}. Toque nos nomes acima para mostrar ou esconder cada linha.`;
+}
+document.getElementById("legend").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-k]");if(!b)return;
+  const k=b.dataset.k;visivel.has(k)?visivel.delete(k):visivel.add(k);
+  drawChart(ultimas);document.getElementById("lg-"+k)?.focus();
+});
+function render(rows){
+  rows.sort((a,b)=>a.data<b.data?-1:1);
+  ultimas=rows; drawChart(rows);
+  const itemsEl=document.getElementById("items"),histEl=document.getElementById("hist");
+  if(!rows.length){
+    document.getElementById("totalLbl").textContent="Nenhuma semana registrada ainda";
+    itemsEl.innerHTML=`<div class="empty">A primeira coleta aparece aqui na próxima segunda-feira.</div>`;
+    histEl.innerHTML="";return;
+  }
+  const cur=rows[rows.length-1],prev=rows[rows.length-2]||null;
+  document.getElementById("totalLbl").textContent=`Total da cesta · coleta de ${fmtData(cur.data)}`;
+  document.getElementById("totalVal").textContent=brl(total(cur));
+  document.getElementById("totalChg").innerHTML=prev?chg(total(cur),total(prev)):`<span class="chip flat">primeira semana</span>`;
+  itemsEl.innerHTML=ITENS.map(i=>`
+    <article class="item">
+      <div><div class="name">${i.nome}</div><div class="spec"><a href="${i.url}" target="_blank" rel="noopener">${i.spec}</a></div></div>
+      <div class="price">${cur[i.k]==null?'<span class="na">sem estoque</span>':brl(cur[i.k])}<div class="unit">por ${i.un}</div></div>
+      <div class="meta">${prev?chg(cur[i.k],prev[i.k])||'<span class="na">sem comparação</span>':'<span class="na">base de comparação</span>'}${spark(rows.map(r=>r[i.k]??null))}</div>
+    </article>`).join("");
+  const desc=[...rows].reverse();
+  histEl.innerHTML=`<div class="tbl"><table><thead><tr><th>Semana</th>${ITENS.map(i=>`<th>${i.nome.replace(" (acém)","")}</th>`).join("")}<th>Total</th></tr></thead><tbody>${
+    desc.map((r,ix)=>{const p=desc[ix+1];return `<tr><td>${fmtData(r.data)}${r.obs?`<small>${esc(r.obs)}</small>`:""}</td>${
+      ITENS.map(i=>{const v=r[i.k],pv=p?p[i.k]:null,c=v!=null&&pv!=null&&Math.abs(v-pv)>=.005?(v>pv?"up":"down"):"";return `<td class="${c}">${v==null?"—":v.toFixed(2).replace(".",",")}</td>`}).join("")
+    }<td><b>${total(r)==null?"—":total(r).toFixed(2).replace(".",",")}</b></td></tr>`}).join("")
+  }</tbody></table></div>`;
+}
+fetch("precos.json?t="+Date.now(),{cache:"no-store"})
+  .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+  .then(d=>render((d.semanas||[]).filter(x=>x&&x.data)))
+  .catch(()=>{document.getElementById("totalLbl").textContent="Não foi possível carregar os preços. Recarregue a página."});
+</script>
 
-def buscar_preco(info):
-    params = urllib.parse.urlencode({"apikey": "paodeacucar", "terms": info["termo"], "salesChannel": "461"})
-    req = urllib.request.Request(f"https://api.linximpulse.com/engage/search/v3/search?{params}")
-    try:
-        with urllib.request.urlopen(req, timeout=15) as r:
-            produtos = json.loads(r.read().decode("utf-8")).get("products", [])
-            for p in produtos:
-                if p.get("price") and p.get("status") == "available":
-                    return round(float(p["price"]), 2)
-    except Exception:
-        pass
-    return info["fallback"]
-
-if __name__ == "__main__":
-    hoje = datetime.date.today().isoformat()
-    coleta = {k: buscar_preco(v) for k, v in PRODUTOS_TRAVADOS.items()}
-    arq = Path("historico.json")
-    hist = json.loads(arq.read_text("utf-8")) if arq.exists() else []
-    hist = [x for x in hist if x["date"] != hoje]
-    hist.append({"date": hoje, "prices": coleta})
-    hist.sort(key=lambda x: x["date"])
-    arq.write_text(json.dumps(hist, indent=2, ensure_ascii=False), "utf-8")</pre>
-            </div>
-
-            <div style="padding:0.9rem 1.4rem; background:#F8FAFC; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.75rem; color:#475569;">Agendador Cron no GitHub Actions: <code class="font-mono">0 11 * * 1</code> (Toda segunda às 08:00 BRT)</span>
-                <button onclick="closeRobotModal()" class="btn btn-dark">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. LÓGICA JAVASCRIPT AUTOCONTIDA E RESILIENTE -->
-    <script>
-        // Catálogo Fixo dos 6 Produtos no Supermercado Pão de Açúcar (Marca, Peso e SKU Travados)
-        const CATALOG = {
-            arroz: {
-                id: 'arroz',
-                name: 'Arroz Agulhinha Tipo 1 CAMIL 5kg',
-                shortName: 'Arroz Camil 5kg',
-                brand: 'CAMIL',
-                weight: 'Pacote 5kg',
-                sku: '#SKU-154820',
-                color: '#D97706',
-                icon: '🌾',
-                volatility: 0.025
-            },
-            feijao: {
-                id: 'feijao',
-                name: 'Feijão Carioca Tipo 1 CAMIL 1kg',
-                shortName: 'Feijão Camil 1kg',
-                brand: 'CAMIL',
-                weight: 'Pacote 1kg',
-                sku: '#SKU-158932',
-                color: '#92400E',
-                icon: '🫘',
-                volatility: 0.03
-            },
-            ovos: {
-                id: 'ovos',
-                name: 'Ovos Brancos Grandes QUALITÁ 20un',
-                shortName: 'Ovos Qualitá 20un',
-                brand: 'QUALITÁ',
-                weight: 'Bandeja 20 un.',
-                sku: '#SKU-298410',
-                color: '#EAB308',
-                icon: '🥚',
-                volatility: 0.032
-            },
-            leite: {
-                id: 'leite',
-                name: 'Leite Longa Vida Integral PIRACANJUBA 1L',
-                shortName: 'Leite Piracanjuba 1L',
-                brand: 'PIRACANJUBA',
-                weight: 'Caixa 1 Litro',
-                sku: '#SKU-190344',
-                color: '#2563EB',
-                icon: '🥛',
-                volatility: 0.035
-            },
-            carne: {
-                id: 'carne',
-                name: 'Contra Filé Bovino Resfriado PÃO DE AÇÚCAR 1kg',
-                shortName: 'Contra Filé 1kg',
-                brand: 'PÃO DE AÇÚCAR',
-                weight: 'Bandeja 1kg',
-                sku: '#SKU-330419',
-                color: '#E11D48',
-                icon: '🥩',
-                volatility: 0.028
-            },
-            oleo: {
-                id: 'oleo',
-                name: 'Óleo de Soja Refinado SOYA Garrafa 900ml',
-                shortName: 'Óleo Soya 900ml',
-                brand: 'SOYA',
-                weight: 'Garrafa 900ml',
-                sku: '#SKU-112850',
-                color: '#0D9488',
-                icon: '🫗',
-                volatility: 0.03
-            }
-        };
-
-        // Série Histórica Calibrada para Outubro de 2026 (Últimas 8 Segundas-feiras até 19/10/2026)
-        function getDefault2026History() {
-            return [
-                { date: '2026-08-31', prices: { arroz: 28.50, feijao: 8.19, ovos: 20.50, leite: 5.59, carne: 55.90, oleo: 7.59 } },
-                { date: '2026-09-07', prices: { arroz: 28.90, feijao: 8.39, ovos: 20.90, leite: 5.69, carne: 56.50, oleo: 7.69 } },
-                { date: '2026-09-14', prices: { arroz: 29.40, feijao: 8.49, ovos: 21.50, leite: 5.79, carne: 56.90, oleo: 7.89 } },
-                { date: '2026-09-21', prices: { arroz: 29.90, feijao: 8.69, ovos: 21.20, leite: 5.69, carne: 56.20, oleo: 7.99 } },
-                { date: '2026-09-28', prices: { arroz: 29.50, feijao: 8.59, ovos: 21.40, leite: 5.89, carne: 57.50, oleo: 7.89 } },
-                { date: '2026-10-05', prices: { arroz: 29.20, feijao: 8.39, ovos: 21.60, leite: 5.99, carne: 56.90, oleo: 8.09 } },
-                { date: '2026-10-12', prices: { arroz: 29.70, feijao: 8.59, ovos: 22.10, leite: 6.19, carne: 56.65, oleo: 8.29 } },
-                { date: '2026-10-19', prices: { arroz: 29.90, feijao: 8.49, ovos: 21.90, leite: 5.99, carne: 57.90, oleo: 8.16 } }
-            ];
-        }
-
-        const STORAGE_KEY = 'quanto_ta_pao_2026_v5';
-        let historyData = [];
-        let currentFilter = 'total';
-
-        function formatBRL(val) {
-            return 'R$ ' + Number(val || 0).toFixed(2).replace('.', ',');
-        }
-
-        function formatPct(val, plusSign = true) {
-            const sign = val > 0 && plusSign ? '+' : '';
-            return sign + val.toFixed(1).replace('.', ',') + '%';
-        }
-
-        function formatDateBR(iso) {
-            if (!iso) return '--';
-            const parts = iso.split('-');
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
-        }
-
-        function formatShortDate(iso) {
-            if (!iso) return '--';
-            const parts = iso.split('-');
-            const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-            return `${parts[2]}/${meses[parseInt(parts[1], 10) - 1]}`;
-        }
-
-        function sumBasket(prices) {
-            return Object.keys(CATALOG).reduce((acc, k) => acc + Number(prices[k] || 0), 0);
-        }
-
-        function loadState() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0].prices && typeof parsed[0].prices.oleo === 'number') {
-                        historyData = parsed;
-                        return;
-                    }
-                }
-            } catch (e) {}
-            historyData = getDefault2026History();
-            saveState();
-        }
-
-        function saveState() {
-            historyData.sort((a, b) => a.date.localeCompare(b.date));
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(historyData));
-            } catch (e) {}
-        }
-
-        function resetToDefault2026() {
-            historyData = getDefault2026History();
-            saveState();
-            renderDashboard();
-            showNotification('Dados restaurados para a série oficial de Outubro/2026!');
-        }
-
-        // 1. Renderizar KPIs do Topo
-        function renderKPIs() {
-            const latest = historyData[historyData.length - 1];
-            const prev = historyData.length > 1 ? historyData[historyData.length - 2] : latest;
-            const first = historyData[0];
-
-            const latestTotal = sumBasket(latest.prices);
-            const prevTotal = sumBasket(prev.prices);
-            const firstTotal = sumBasket(first.prices);
-
-            const weekDiff = latestTotal - prevTotal;
-            const weekPct = prevTotal > 0 ? (weekDiff / prevTotal) * 100 : 0;
-
-            const accDiff = latestTotal - firstTotal;
-            const accPct = firstTotal > 0 ? (accDiff / firstTotal) * 100 : 0;
-
-            // Calcula próxima segunda-feira (+7 dias)
-            const dObj = new Date(latest.date + 'T12:00:00');
-            dObj.setDate(dObj.getDate() + 7);
-            const nextISO = dObj.toISOString().split('T')[0];
-
-            document.getElementById('status-last-monday').textContent = `Última segunda: ${formatDateBR(latest.date)}`;
-            document.getElementById('status-next-monday').textContent = `Próxima coleta: ${formatDateBR(nextISO)} às 08:00`;
-
-            document.getElementById('kpi-date-pill').textContent = formatDateBR(latest.date);
-            document.getElementById('kpi-total-value').textContent = formatBRL(latestTotal);
-
-            const weekTag = document.getElementById('kpi-weekly-tag');
-            if (weekDiff > 0.005) {
-                weekTag.className = 'tag-up font-mono';
-                weekTag.textContent = `▲ ${formatPct(weekPct)} (+${formatBRL(weekDiff)})`;
-            } else if (weekDiff < -0.005) {
-                weekTag.className = 'tag-down font-mono';
-                weekTag.textContent = `▼ ${formatPct(weekPct)} (${formatBRL(weekDiff)})`;
-            } else {
-                weekTag.className = 'tag-neutral font-mono';
-                weekTag.textContent = `= 0,0% (Estável)`;
-            }
-
-            const allTotals = historyData.map(h => sumBasket(h.prices));
-            const minBasket = Math.min(...allTotals);
-
-            const accPctEl = document.getElementById('kpi-acc-pct');
-            accPctEl.textContent = formatPct(accPct);
-            accPctEl.style.color = accDiff >= 0 ? '#E11D48' : '#059669';
-            document.getElementById('kpi-acc-brl').textContent = `(${accDiff >= 0 ? '+' : ''}${formatBRL(accDiff)})`;
-            document.getElementById('kpi-weeks-badge').textContent = `${historyData.length} segundas`;
-            document.getElementById('kpi-start-date').textContent = formatDateBR(first.date);
-            document.getElementById('kpi-min-max-summary').textContent = `Mín: ${formatBRL(minBasket)}`;
-
-            // Vilão e Alívio da Semana
-            const diffs = Object.keys(CATALOG).map(k => {
-                const c = latest.prices[k];
-                const p = prev.prices[k];
-                const pct = p > 0 ? ((c - p) / p) * 100 : 0;
-                return { key: k, ...CATALOG[k], c, pct };
-            }).sort((a, b) => b.pct - a.pct);
-
-            const villain = diffs[0];
-            const relief = diffs[diffs.length - 1];
-
-            document.getElementById('kpi-villain-name').textContent = villain.name;
-            document.getElementById('kpi-villain-brand').textContent = `Marca Fixa: ${villain.brand} (${villain.sku})`;
-            document.getElementById('kpi-villain-badge').textContent = `▲ ${formatPct(villain.pct)}`;
-            document.getElementById('kpi-villain-price').textContent = formatBRL(villain.c);
-
-            document.getElementById('kpi-relief-name').textContent = relief.name;
-            document.getElementById('kpi-relief-brand').textContent = `Marca Fixa: ${relief.brand} (${relief.sku})`;
-            document.getElementById('kpi-relief-badge').textContent = `${relief.pct <= 0 ? '▼' : '▲'} ${formatPct(relief.pct)}`;
-            document.getElementById('kpi-relief-price').textContent = formatBRL(relief.c);
-        }
-
-        // Mini Sparkline SVG para cada Card de Produto
-        function createSparklineSVG(values, strokeColor) {
-            const min = Math.min(...values);
-            const max = Math.max(...values);
-            const range = (max - min) || 1;
-            const w = 115, h = 30;
-            const pts = values.map((v, i) => {
-                const x = (i / (values.length - 1)) * w;
-                const y = h - 4 - ((v - min) / range) * (h - 8);
-                return `${x.toFixed(1)},${y.toFixed(1)}`;
-            }).join(' ');
-
-            return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="overflow:visible;">
-                <polyline fill="none" stroke="${strokeColor}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>
-            </svg>`;
-        }
-
-        // 2. Renderizar os 6 Cards de Produtos Fixos
-        function renderProductsGrid() {
-            const container = document.getElementById('products-cards-container');
-            const latest = historyData[historyData.length - 1];
-            const prev = historyData.length > 1 ? historyData[historyData.length - 2] : latest;
-
-            container.innerHTML = Object.keys(CATALOG).map(key => {
-                const item = CATALOG[key];
-                const series = historyData.map(h => h.prices[key]);
-                const curr = latest.prices[key];
-                const prv = prev.prices[key];
-                const diff = curr - prv;
-                const pct = prv > 0 ? (diff / prv) * 100 : 0;
-                const minP = Math.min(...series);
-                const maxP = Math.max(...series);
-
-                let tagHtml = `<span class="tag-neutral font-mono">= 0,0%</span>`;
-                if (diff > 0.005) tagHtml = `<span class="tag-up font-mono">▲ ${formatPct(pct)}</span>`;
-                else if (diff < -0.005) tagHtml = `<span class="tag-down font-mono">▼ ${formatPct(pct)}</span>`;
-
-                const activeClass = currentFilter === key ? 'active-card' : '';
-
-                return `
-                <div class="product-card ${activeClass}" onclick="setChartFilter('${key}')">
-                    <div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.65rem;">
-                            <span style="font-size:1.35rem; background:#F8FAFC; border:1px solid #E2E8F0; width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px;">
-                                ${item.icon}
-                            </span>
-                            <span class="font-mono" style="font-size:0.68rem; font-weight:700; background:#F1F5F9; color:#334155; padding:0.2rem 0.5rem; border-radius:6px; border:1px solid #E2E8F0;">
-                                🔒 ${item.sku}
-                            </span>
-                        </div>
-                        <h3 style="font-size:0.95rem; font-weight:800; color:#0F172A; line-height:1.3;">
-                            ${item.name}
-                        </h3>
-                        <div style="margin-top:0.4rem; display:inline-block; font-size:0.72rem; background:#F8FAFC; border:1px solid #E2E8F0; padding:0.15rem 0.5rem; border-radius:6px; color:#475569;">
-                            Marca Fixa: <strong style="color:#0F172A;">${item.brand}</strong> • ${item.weight}
-                        </div>
-                    </div>
-
-                    <div style="margin: 1rem 0; padding-top:0.85rem; border-top:1px solid #F1F5F9; display:flex; align-items:flex-end; justify-content:space-between;">
-                        <div>
-                            <span class="font-mono" style="font-size:0.65rem; text-transform:uppercase; color:#64748B; display:block;">Preço Atual (${formatShortDate(latest.date)})</span>
-                            <span class="font-mono" style="font-size:1.45rem; font-weight:800; color:#0F172A;">${formatBRL(curr)}</span>
-                            <span class="font-mono" style="font-size:0.7rem; color:#94A3B8; display:block;">Anterior: ${formatBRL(prv)}</span>
-                        </div>
-                        <div style="text-align:right;">
-                            ${tagHtml}
-                        </div>
-                    </div>
-
-                    <div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
-                            <span class="font-mono" style="font-size:0.68rem; color:#64748B;">Evolução (${historyData.length} sem.)</span>
-                            ${createSparklineSVG(series, item.color)}
-                        </div>
-                        <div class="font-mono" style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; font-size:0.7rem; padding-top:0.5rem; border-top:1px solid #F1F5F9;">
-                            <div style="background:#ECFDF5; color:#065F46; padding:0.25rem 0.45rem; border-radius:6px;">
-                                MÍN: <strong>${formatBRL(minP)}</strong>
-                            </div>
-                            <div style="background:#FFF1F2; color:#9F1239; padding:0.25rem 0.45rem; border-radius:6px; text-align:right;">
-                                MÁX: <strong>${formatBRL(maxP)}</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // 3. Motor Nativo de Gráfico Interativo em SVG (Zero Dependência Externa / Nunca Fica em Branco)
-        function renderInteractiveSVGChart() {
-            const stage = document.getElementById('interactive-chart-stage');
-            const labels = historyData.map(h => formatShortDate(h.date));
-            const fullDates = historyData.map(h => formatDateBR(h.date));
-
-            let values = [];
-            let lineColor = '#059669';
-            let labelTitle = 'Custo Total da Cesta (R$)';
-
-            if (currentFilter === 'total') {
-                values = historyData.map(h => Number(sumBasket(h.prices).toFixed(2)));
-                lineColor = '#10B981';
-                document.getElementById('chart-main-title').textContent = 'Evolução Semanal — Cesta Completa (6 Itens)';
-                document.getElementById('chart-sub-title').textContent = 'Soma dos 6 produtos travados no Pão de Açúcar a cada segunda-feira';
-                document.getElementById('chart-dot').style.background = lineColor;
-            } else {
-                const prod = CATALOG[currentFilter];
-                values = historyData.map(h => Number(h.prices[currentFilter].toFixed(2)));
-                lineColor = prod.color;
-                labelTitle = prod.shortName;
-                document.getElementById('chart-main-title').textContent = `${prod.name} (${prod.sku})`;
-                document.getElementById('chart-sub-title').textContent = `Marca Fixa: ${prod.brand} • ${prod.weight} — Supermercado Pão de Açúcar`;
-                document.getElementById('chart-dot').style.background = lineColor;
-            }
-
-            const minVal = Math.min(...values);
-            const maxVal = Math.max(...values);
-            const avgVal = values.reduce((a, b) => a + b, 0) / values.length;
-
-            document.getElementById('stat-min').textContent = formatBRL(minVal);
-            document.getElementById('stat-max').textContent = formatBRL(maxVal);
-            document.getElementById('stat-avg').textContent = formatBRL(avgVal);
-
-            // Geometria do SVG
-            const width = 960;
-            const height = 310;
-            const padLeft = 72;
-            const padRight = 32;
-            const padTop = 28;
-            const padBottom = 42;
-            const plotW = width - padLeft - padRight;
-            const plotH = height - padTop - padBottom;
-
-            const padRange = (maxVal - minVal) === 0 ? 2 : (maxVal - minVal) * 0.22;
-            const yMin = Math.max(0, minVal - padRange);
-            const yMax = maxVal + padRange;
-
-            const coords = values.map((v, idx) => {
-                const x = padLeft + (idx / Math.max(1, values.length - 1)) * plotW;
-                const y = padTop + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
-                return { x, y, val: v, label: labels[idx], fullDate: fullDates[idx] };
-            });
-
-            const polylinePoints = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
-            const areaPoints = `${coords[0].x.toFixed(1)},${padTop + plotH} ${polylinePoints} ${coords[coords.length - 1].x.toFixed(1)},${padTop + plotH}`;
-
-            // Linhas horizontais de grade (4 níveis)
-            let gridHtml = '';
-            for (let i = 0; i <= 4; i++) {
-                const gy = padTop + (i / 4) * plotH;
-                const gVal = yMax - (i / 4) * (yMax - yMin);
-                gridHtml += `
-                    <line x1="${padLeft}" y1="${gy}" x2="${width - padRight}" y2="${gy}" stroke="#E2E8F0" stroke-dasharray="4 4" stroke-width="1"/>
-                    <text x="${padLeft - 10}" y="${gy + 4}" text-anchor="end" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="11">
-                        R$ ${gVal.toFixed(2).replace('.', ',')}
-                    </text>
-                `;
-            }
-
-            // Pontos e Rótulos
-            const circlesHtml = coords.map((c, idx) => `
-                <g class="chart-point-group" style="cursor:pointer;">
-                    <line x1="${c.x}" y1="${padTop}" x2="${c.x}" y2="${padTop + plotH}" stroke="#CBD5E1" stroke-width="1" opacity="0.4"/>
-                    <circle cx="${c.x}" cy="${c.y}" r="6" fill="#FFFFFF" stroke="${lineColor}" stroke-width="3"/>
-                    <rect x="${c.x - 36}" y="${c.y - 30}" width="72" height="20" rx="5" fill="#0A0A0A"/>
-                    <text x="${c.x}" y="${c.y - 16}" text-anchor="middle" fill="#CCFF00" font-family="JetBrains Mono, monospace" font-weight="700" font-size="10.5">
-                        ${formatBRL(c.val)}
-                    </text>
-                    <text x="${c.x}" y="${height - 12}" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-weight="600" font-size="11">
-                        ${c.label}
-                    </text>
-                </g>
-            `).join('');
-
-            stage.innerHTML = `
-                <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%; overflow:visible;">
-                    <defs>
-                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="${lineColor}" stop-opacity="0.25"/>
-                            <stop offset="100%" stop-color="${lineColor}" stop-opacity="0.0"/>
-                        </linearGradient>
-                    </defs>
-                    ${gridHtml}
-                    <polygon points="${areaPoints}" fill="url(#chartGrad)"/>
-                    <polyline fill="none" stroke="${lineColor}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="${polylinePoints}"/>
-                    ${circlesHtml}
-                </svg>
-            `;
-        }
-
-        function setChartFilter(filterKey) {
-            currentFilter = filterKey;
-            document.querySelectorAll('#chart-tabs .filter-btn').forEach(btn => {
-                if (btn.getAttribute('data-filter') === filterKey) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            renderProductsGrid();
-            renderInteractiveSVGChart();
-        }
-
-        // 4. Renderizar Tabela Histórica Completa
-        function renderHistoryTable() {
-            const tbody = document.getElementById('history-tbody');
-            const reversed = [...historyData].reverse();
-
-            tbody.innerHTML = reversed.map((row, idx) => {
-                const origIdx = historyData.length - 1 - idx;
-                const prevRow = origIdx > 0 ? historyData[origIdx - 1] : null;
-
-                const total = sumBasket(row.prices);
-                const prevTotal = prevRow ? sumBasket(prevRow.prices) : total;
-                const diff = total - prevTotal;
-                const pct = prevRow && prevTotal > 0 ? (diff / prevTotal) * 100 : 0;
-
-                let badge = `<span class="tag-neutral">Início</span>`;
-                if (prevRow) {
-                    if (diff > 0.005) badge = `<span class="tag-up">▲ ${formatPct(pct)}</span>`;
-                    else if (diff < -0.005) badge = `<span class="tag-down">▼ ${formatPct(pct)}</span>`;
-                    else badge = `<span class="tag-neutral">0,0%</span>`;
-                }
-
-                return `
-                <tr>
-                    <td style="font-weight:700; color:#0F172A;">
-                        ${formatDateBR(row.date)}
-                        ${idx === 0 ? '<span style="margin-left:0.4rem; background:#0A0A0A; color:#CCFF00; padding:0.1rem 0.4rem; border-radius:4px; font-size:0.65rem;">ATUAL</span>' : ''}
-                    </td>
-                    <td style="text-align:right;">${formatBRL(row.prices.arroz)}</td>
-                    <td style="text-align:right;">${formatBRL(row.prices.feijao)}</td>
-                    <td style="text-align:right;">${formatBRL(row.prices.ovos)}</td>
-                    <td style="text-align:right;">${formatBRL(row.prices.leite)}</td>
-                    <td style="text-align:right;">${formatBRL(row.prices.carne)}</td>
-                    <td style="text-align:right;">${formatBRL(row.prices.oleo)}</td>
-                    <td style="text-align:right; font-weight:800; background:#F8FAFC; color:#0F172A;">${formatBRL(total)}</td>
-                    <td style="text-align:right;">${badge}</td>
-                    <td style="text-align:center;">
-                        <button onclick="openEditRow('${row.date}')" style="background:#F1F5F9; border:1px solid #CBD5E1; border-radius:6px; padding:0.2rem 0.5rem; cursor:pointer; font-size:0.72rem;" title="Editar preços desta segunda-feira">
-                            ✏️ Editar
-                        </button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-
-        // 5. Simular Próxima Segunda-feira (ex: 26/10/2026)
-        function simulateMondayScrape() {
-            const latest = historyData[historyData.length - 1];
-            const nextDateObj = new Date(latest.date + 'T12:00:00');
-            nextDateObj.setDate(nextDateObj.getDate() + 7);
-            const nextISO = nextDateObj.toISOString().split('T')[0];
-
-            const simulatedPrices = {};
-            Object.keys(CATALOG).forEach(k => {
-                const base = latest.prices[k];
-                const vol = CATALOG[k].volatility;
-                const delta = (Math.random() * (vol * 2.1)) - vol;
-                const rawPrice = base * (1 + delta);
-                simulatedPrices[k] = Number((Math.round(rawPrice * 10) / 10).toFixed(2));
-            });
-
-            historyData.push({
-                date: nextISO,
-                prices: simulatedPrices
-            });
-
-            saveState();
-            renderDashboard();
-            showNotification(`Coleta de segunda-feira (${formatDateBR(nextISO)}) adicionada! Total: ${formatBRL(sumBasket(simulatedPrices))}`);
-        }
-
-        // 6. Modal de Inserção / Edição Manual
-        function openManualModal() {
-            const latest = historyData[historyData.length - 1];
-            const nextDateObj = new Date(latest.date + 'T12:00:00');
-            nextDateObj.setDate(nextDateObj.getDate() + 7);
-            const nextISO = nextDateObj.toISOString().split('T')[0];
-
-            document.getElementById('manual-modal-title').textContent = 'Registrar Nova Segunda-feira';
-            document.getElementById('form-date').value = nextISO;
-            document.getElementById('form-arroz').value = latest.prices.arroz.toFixed(2);
-            document.getElementById('form-feijao').value = latest.prices.feijao.toFixed(2);
-            document.getElementById('form-ovos').value = latest.prices.ovos.toFixed(2);
-            document.getElementById('form-leite').value = latest.prices.leite.toFixed(2);
-            document.getElementById('form-carne').value = latest.prices.carne.toFixed(2);
-            document.getElementById('form-oleo').value = latest.prices.oleo.toFixed(2);
-
-            document.getElementById('manual-modal').classList.add('open');
-        }
-
-        function openEditRow(dateISO) {
-            const row = historyData.find(h => h.date === dateISO);
-            if (!row) return;
-            document.getElementById('manual-modal-title').textContent = `Editar Segunda-feira (${formatDateBR(dateISO)})`;
-            document.getElementById('form-date').value = row.date;
-            document.getElementById('form-arroz').value = row.prices.arroz.toFixed(2);
-            document.getElementById('form-feijao').value = row.prices.feijao.toFixed(2);
-            document.getElementById('form-ovos').value = row.prices.ovos.toFixed(2);
-            document.getElementById('form-leite').value = row.prices.leite.toFixed(2);
-            document.getElementById('form-carne').value = row.prices.carne.toFixed(2);
-            document.getElementById('form-oleo').value = row.prices.oleo.toFixed(2);
-
-            document.getElementById('manual-modal').classList.add('open');
-        }
-
-        function closeManualModal() {
-            document.getElementById('manual-modal').classList.remove('open');
-        }
-
-        function handleSaveManual(e) {
-            e.preventDefault();
-            const dateISO = document.getElementById('form-date').value;
-            const newPrices = {
-                arroz: parseFloat(document.getElementById('form-arroz').value),
-                feijao: parseFloat(document.getElementById('form-feijao').value),
-                ovos: parseFloat(document.getElementById('form-ovos').value),
-                leite: parseFloat(document.getElementById('form-leite').value),
-                carne: parseFloat(document.getElementById('form-carne').value),
-                oleo: parseFloat(document.getElementById('form-oleo').value)
-            };
-
-            const idx = historyData.findIndex(h => h.date === dateISO);
-            if (idx >= 0) {
-                historyData[idx].prices = newPrices;
-            } else {
-                historyData.push({ date: dateISO, prices: newPrices });
-            }
-
-            saveState();
-            renderDashboard();
-            closeManualModal();
-            showNotification(`Preços de ${formatDateBR(dateISO)} salvos com sucesso!`);
-        }
-
-        // Modal do Robô Python
-        function openRobotModal() {
-            document.getElementById('robot-modal').classList.add('open');
-        }
-        function closeRobotModal() {
-            document.getElementById('robot-modal').classList.remove('open');
-        }
-        function copyPythonCode() {
-            const code = document.getElementById('python-code-block').innerText;
-            const el = document.createElement('textarea');
-            el.value = code;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showNotification('Script Python copiado para a área de transferência!');
-        }
-
-        // Exportar CSV e JSON
-        function exportCSVFile() {
-            const header = 'Data_Segunda,Arroz_Camil_5kg,Feijao_Camil_1kg,Ovos_Qualita_20un,Leite_Piracanjuba_1L,ContraFile_1kg,Oleo_Soya_900ml,Total_Cesta';
-            const lines = historyData.map(h => {
-                const tot = sumBasket(h.prices).toFixed(2);
-                return `${h.date},${h.prices.arroz.toFixed(2)},${h.prices.feijao.toFixed(2)},${h.prices.ovos.toFixed(2)},${h.prices.leite.toFixed(2)},${h.prices.carne.toFixed(2)},${h.prices.oleo.toFixed(2)},${tot}`;
-            });
-            const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'quanto_ta_cesta_pao_de_acucar.csv';
-            a.click();
-            showNotification('Planilha CSV baixada com sucesso!');
-        }
-
-        function exportJSONFile() {
-            const blob = new Blob([JSON.stringify(historyData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'quanto_ta_historico.json';
-            a.click();
-            showNotification('Arquivo JSON exportado!');
-        }
-
-        function showNotification(msg) {
-            const box = document.getElementById('toast-box');
-            const item = document.createElement('div');
-            item.style.cssText = 'background:#0A0A0A; color:#FFFFFF; border:1.5px solid #CCFF00; padding:0.75rem 1rem; border-radius:12px; font-size:0.8rem; font-weight:600; box-shadow:0 10px 25px rgba(0,0,0,0.3); display:flex; align-items:center; gap:0.5rem;';
-            item.innerHTML = `<span style="color:#CCFF00;">✔</span> <span>${msg}</span>`;
-            box.appendChild(item);
-            setTimeout(() => item.remove(), 3500);
-        }
-
-        function renderDashboard() {
-            try {
-                renderKPIs();
-                renderProductsGrid();
-                renderInteractiveSVGChart();
-                renderHistoryTable();
-            } catch (err) {
-                console.error('Erro ao renderizar painel:', err);
-            }
-        }
-
-        // Inicialização Imediata e Segura
-        document.addEventListener('DOMContentLoaded', () => {
-            loadState();
-            renderDashboard();
-        });
-    </script>
 </body>
 </html>
