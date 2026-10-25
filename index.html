@@ -71,6 +71,20 @@ td small{display:block;font-size:11px}
 .legend button[aria-pressed="false"]{color:var(--muted);opacity:.55}
 .legend button[aria-pressed="false"] .sw{background:var(--line)}
 .legend button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.busca{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:10px}
+.busca label{font-weight:600}
+.busca-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.busca input{font:500 15px var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-height:42px}
+.busca button{font:500 14px var(--body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:6px;padding:8px 12px;min-height:42px;cursor:pointer}
+.busca input:focus-visible,.busca button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.res{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.res-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.res-top .val{font:800 32px/1 var(--display);font-variant-numeric:tabular-nums}
+.res .aviso{color:var(--muted);font-size:13px;margin:0}
+.res ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px 16px}
+.res li{display:flex;justify-content:space-between;gap:8px;font-size:14px;border-bottom:1px dotted var(--line);padding-block:3px}
+.res li span:last-child{font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr.sel td{background:color-mix(in srgb,var(--accent) 14%,transparent)}
 footer{color:var(--muted);font-size:13px;display:grid;gap:6px}
 footer p{margin:0}
 </style>
@@ -112,6 +126,14 @@ footer p{margin:0}
 
   <section style="display:grid;gap:12px">
     <h2>Histórico</h2>
+    <div class="busca">
+      <label for="buscaData">Quanto dava a compra em uma data</label>
+      <div class="busca-row">
+        <input type="date" id="buscaData">
+        <button type="button" id="buscaLimpar" hidden>Limpar</button>
+      </div>
+      <div id="buscaRes" aria-live="polite"></div>
+    </div>
     <div id="hist"></div>
   </section>
 
@@ -136,7 +158,7 @@ function chg(cur,prev){
   if(cur==null||prev==null)return "";
   const d=cur-prev; if(Math.abs(d)<0.005)return `<span class="chip flat">= estável</span>`;
   const p=(d/prev*100).toLocaleString("pt-BR",{maximumFractionDigits:1});
-  return `<span class="chip ${d>0?"up":"down"}">${d>0?"▲ +":"▼ "}${brl(d).replace("R$","R$ ")} (${d>0?"+":""}${p}%)</span>`;
+  return `<span class="chip ${d>0?"up":"down"}">${d>0?"▲ +":"▼ "}${brl(d)} (${d>0?"+":""}${p}%)</span>`;
 }
 function total(r){let t=0;for(const i of ITENS){if(r[i.k]==null)return null;t+=r[i.k]}return Math.round(t*100)/100}
 function spark(vals){
@@ -195,6 +217,28 @@ document.getElementById("legend").addEventListener("click",e=>{
   const k=b.dataset.k;visivel.has(k)?visivel.delete(k):visivel.add(k);
   drawChart(ultimas);document.getElementById("lg-"+k)?.focus();
 });
+function buscar(){
+  const inp=document.getElementById("buscaData"),out=document.getElementById("buscaRes"),limpar=document.getElementById("buscaLimpar");
+  const rows=ultimas;
+  if(rows.length){inp.min=rows[0].data;inp.max=rows[rows.length-1].data;}
+  document.querySelectorAll("#hist tr.sel").forEach(t=>t.classList.remove("sel"));
+  const q=inp.value; limpar.hidden=!q;
+  if(!q){out.innerHTML="";return}
+  if(!rows.length){out.innerHTML=`<p class="aviso">Ainda não há semanas registradas.</p>`;return}
+  let r=null; for(const x of rows){if(x.data<=q)r=x}
+  if(!r){out.innerHTML=`<div class="res"><p class="aviso">Os registros começam em ${fmtData(rows[0].data)}. Escolha essa data ou uma depois dela.</p></div>`;return}
+  const atual=rows[rows.length-1],t=total(r),ta=total(atual);
+  const aviso=r.data===q?"":`<p class="aviso">Não houve coleta em ${fmtData(q)}. Mostrando a coleta anterior mais próxima, de ${fmtData(r.data)}.</p>`;
+  const comp=r===atual?`<span class="chip flat">é a coleta mais recente</span>`:(t!=null&&ta!=null?`${chg(ta,t)} <span class="na">até hoje (${brl(ta)})</span>`:"");
+  out.innerHTML=`<div class="res">${aviso}
+    <div class="res-top"><span class="na">Total em ${fmtData(r.data)}</span></div>
+    <div class="res-top"><span class="val">${brl(t)}</span>${comp}</div>
+    <ul>${ITENS.map(i=>`<li><span>${i.nome}</span><span>${brl(r[i.k])}</span></li>`).join("")}</ul></div>`;
+  document.getElementById("row-"+r.data)?.classList.add("sel");
+}
+document.getElementById("buscaData").addEventListener("change",buscar);
+document.getElementById("buscaData").addEventListener("input",buscar);
+document.getElementById("buscaLimpar").addEventListener("click",()=>{const i=document.getElementById("buscaData");i.value="";buscar();i.focus()});
 function render(rows){
   rows.sort((a,b)=>a.data<b.data?-1:1);
   ultimas=rows; drawChart(rows);
@@ -216,10 +260,11 @@ function render(rows){
     </article>`).join("");
   const desc=[...rows].reverse();
   histEl.innerHTML=`<div class="tbl"><table><thead><tr><th>Semana</th>${ITENS.map(i=>`<th>${i.nome.replace(" (acém)","")}</th>`).join("")}<th>Total</th></tr></thead><tbody>${
-    desc.map((r,ix)=>{const p=desc[ix+1];return `<tr><td>${fmtData(r.data)}${r.obs?`<small>${esc(r.obs)}</small>`:""}</td>${
+    desc.map((r,ix)=>{const p=desc[ix+1];return `<tr id="row-${r.data}"><td>${fmtData(r.data)}${r.obs?`<small>${esc(r.obs)}</small>`:""}</td>${
       ITENS.map(i=>{const v=r[i.k],pv=p?p[i.k]:null,c=v!=null&&pv!=null&&Math.abs(v-pv)>=.005?(v>pv?"up":"down"):"";return `<td class="${c}">${v==null?"—":v.toFixed(2).replace(".",",")}</td>`}).join("")
     }<td><b>${total(r)==null?"—":total(r).toFixed(2).replace(".",",")}</b></td></tr>`}).join("")
   }</tbody></table></div>`;
+  buscar();
 }
 fetch("precos.json?t="+Date.now(),{cache:"no-store"})
   .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
