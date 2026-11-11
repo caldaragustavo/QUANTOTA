@@ -7,4 +7,4 @@ Registro semanal dos preços da cesta básica no Pão de Açúcar (São Paulo), 
 - `precos.json`: cópia do histórico até 09/11/2026 (não é atualizada automaticamente).
 - `logo.png` e `icons/`: logo e ícones da Tela de Início.
 
-Itens: arroz Camil 5 kg, feijão carioca Camil 1 kg, ovos brancos grandes (12 un.), leite Italac integral 1 L, óleo de soja Liza 900 ml e acém (preço por kg).
+Itens: arroz Camil 5 kg, feijão carioca Camil 1 kg, ovos brancos grandes (12 un.), leite Italac integral 1 L, óleo de soja Liza 900 ml, acém, tomate granel e batata granel (os três últimos com preço por kg; tomate e batata desde 16/11/2026).
